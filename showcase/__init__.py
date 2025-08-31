@@ -1,1 +1,5 @@
-__version__ = "0.0.1"
+# ERPNext Showcase App
+# Version: 1.0.0
+# Description: Show product by scan barcode or search by name
+
+__version__ = "1.0.0"
