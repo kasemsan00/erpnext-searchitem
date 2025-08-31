@@ -2,6 +2,9 @@
 
 frappe.provide("showcase");
 
+// Debug: Check if frappe is available
+console.log("Showcase JS loaded. Frappe available:", typeof frappe !== "undefined");
+
 showcase = {
 	// Initialize the showcase app
 	init: function () {
@@ -20,9 +23,10 @@ showcase = {
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log(e.key);
+			console.log("Key pressed:", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
+				console.log("Enter key detected, handling search for:", $(this).val());
 				showcase.handleEnterKey($(this).val());
 			}
 		});

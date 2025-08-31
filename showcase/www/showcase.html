@@ -396,7 +396,11 @@ block page_content %}
 	// Initialize showcase when page loads
 	$(document).ready(function () {
 		// Load initial products
-		showcase.loadProducts();
+		if (typeof showcase !== "undefined") {
+			showcase.loadProducts();
+		} else {
+			console.error("Showcase object not found. Please check if showcase.js is loaded.");
+		}
 	});
 </script>
 {% endblock %}
