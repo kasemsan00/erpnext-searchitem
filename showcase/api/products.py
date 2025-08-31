@@ -43,7 +43,7 @@ def search_products(query, limit=20):
         if not query or len(query) < 2:
             return []
         
-        # Use optimized search query
+        # Use optimized search query with OR condition for both name and code
         products = frappe.get_all(
             "Item",
             fields=[
@@ -53,7 +53,11 @@ def search_products(query, limit=20):
             filters=[
                 ["disabled", "=", 0],
                 ["is_stock_item", "=", 1],
-                ["item_name", "like", f"%{query}%"]
+                ["name", "like", f"%{query}%"]
+            ],
+            or_filters=[
+                ["item_name", "like", f"%{query}%"],
+                ["item_code", "like", f"%{query}%"]
             ],
             limit=limit,
             order_by="modified desc"
@@ -69,6 +73,101 @@ def search_products(query, limit=20):
     except Exception as e:
         frappe.log_error(f"Showcase Search Error: {str(e)}", "Showcase API")
         return []
+
+@frappe.whitelist()
+def get_product_by_code(item_code):
+    """
+    Get product by specific item code with performance optimizations
+    """
+    try:
+        if not item_code:
+            return []
+        
+        # Search for exact item code match
+        products = frappe.get_all(
+            "Item",
+            fields=[
+                "name", "item_name", "item_code", "description", 
+                "standard_rate", "image", "item_group", "stock_uom"
+            ],
+            filters=[
+                ["disabled", "=", 0],
+                ["is_stock_item", "=", 1],
+                ["item_code", "=", item_code]
+            ],
+            limit=1
+        )
+        
+        # If no exact match, try partial match
+        if not products:
+            products = frappe.get_all(
+                "Item",
+                fields=[
+                    "name", "item_name", "item_code", "description", 
+                    "standard_rate", "image", "item_group", "stock_uom"
+                ],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_code", "like", f"%{item_code}%"]
+                ],
+                limit=5
+            )
+        
+        # Add image URLs
+        for product in products:
+            if product.image:
+                product.image = frappe.get_url(product.image)
+        
+        return products
+        
+    except Exception as e:
+        frappe.log_error(f"Showcase Item Code Error: {str(e)}", "Showcase API")
+        return []
+
+@frappe.whitelist()
+def get_product_details(product_id):
+    """
+    Get detailed product information for modal display
+    """
+    try:
+        if not product_id:
+            return None
+        
+        # Get detailed product information
+        product = frappe.get_doc("Item", product_id)
+        
+        if not product or product.disabled:
+            return None
+        
+        # Get additional details
+        details = {
+            "name": product.name,
+            "item_name": product.item_name,
+            "item_code": product.item_code,
+            "description": product.description,
+            "standard_rate": product.standard_rate,
+            "image": frappe.get_url(product.image) if product.image else None,
+            "item_group": product.item_group,
+            "stock_uom": product.stock_uom,
+            "brand": product.brand,
+            "weight_per_unit": product.weight_per_unit,
+            "weight_uom": product.weight_uom,
+            "is_stock_item": product.is_stock_item,
+            "allow_alternative_item": product.allow_alternative_item,
+            "is_fixed_asset": product.is_fixed_asset,
+            "auto_create_assets": product.auto_create_assets,
+            "asset_category": product.asset_category,
+            "asset_naming_series": product.asset_naming_series,
+            "over_delivery_receipt_allowance": product.over_delivery_receipt_allowance,
+            "over_billing_allowance": product.over_billing_allowance
+        }
+        
+        return details
+        
+    except Exception as e:
+        frappe.log_error(f"Showcase Product Details Error: {str(e)}", "Showcase API")
+        return None
 
 @frappe.whitelist()
 def get_product_by_barcode(barcode):

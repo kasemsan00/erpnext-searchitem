@@ -4,4 +4,5 @@ globs:
 alwaysApply: true
 ---
 
-this is app for erpnext frappe for 
+- this is app for erpnext frappe for
+- ui use frappe-ui
