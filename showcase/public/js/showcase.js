@@ -23,18 +23,12 @@ showcase = {
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log("Key pressed:", e.key);
+			console.log("Key pressed xx:", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
 				showcase.handleEnterKey($(this).val());
 			}
-		});
-
-		// Product card click
-		$(document).on("click", ".showcase-product-card", function () {
-			const productId = $(this).data("product-id");
-			showcase.showProductDetails(productId);
 		});
 
 		// Search suggestion clicks
@@ -115,11 +109,8 @@ showcase = {
 			callback: function (r) {
 				showcase.hideLoading();
 				if (r.message && r.message.length > 0) {
-					showcase.renderProducts(r.message);
-					if (r.message.length === 1) {
-						// If only one product found, show its details
-						showcase.showProductDetails(r.message[0].name);
-					}
+					// Show the first product details directly
+					showcase.showProductDetails(r.message[0].name);
 				} else {
 					showcase.showNoProducts();
 					frappe.show_alert(__("No product found with code: {0}", [itemCode]), 3);
@@ -208,92 +199,27 @@ showcase = {
 	// Show loading state
 	showLoading: function () {
 		$("#loading-state").show();
-		$("#products-grid").hide();
+		$("#product-detail").hide();
 		$("#no-products").hide();
 	},
 
 	// Hide loading state
 	hideLoading: function () {
 		$("#loading-state").hide();
-		$("#products-grid").show();
 	},
 
 	// Show no products state
 	showNoProducts: function () {
 		$("#no-products").show();
-		$("#products-grid").hide();
+		$("#product-detail").hide();
 	},
 
-	// Load all products
+	// Load all products - now just hides product detail
 	loadProducts: function () {
-		this.showLoading();
+		this.hideLoading();
 		this.hideSuggestions();
-
-		frappe.call({
-			method: "showcase.api.products.get_products",
-			callback: function (r) {
-				showcase.hideLoading();
-				if (r.message) {
-					showcase.renderProducts(r.message);
-				}
-			},
-			error: function () {
-				showcase.hideLoading();
-				showcase.showNoProducts();
-			},
-		});
-	},
-
-	// Render products in the grid
-	renderProducts: function (products) {
-		const container = $("#products-grid");
-		container.empty();
-
-		if (!products || products.length === 0) {
-			this.showNoProducts();
-			return;
-		}
-
-		// Use document fragment for better performance
-		const fragment = document.createDocumentFragment();
-
-		products.forEach((product) => {
-			const productCard = this.createProductCard(product);
-			const tempDiv = document.createElement("div");
-			tempDiv.innerHTML = productCard;
-			fragment.appendChild(tempDiv.firstElementChild);
-		});
-
-		container.append(fragment);
+		$("#product-detail").hide();
 		$("#no-products").hide();
-	},
-
-	// Create product card HTML
-	createProductCard: function (product) {
-		const price = this.formatPrice(product.standard_rate);
-		const description = product.description || "";
-		const truncatedDescription =
-			description.length > 100 ? description.substring(0, 100) + "..." : description;
-
-		return `
-            <div class="showcase-product-card" data-product-id="${product.name}">
-                <img src="${product.image || "/assets/showcase/images/default-product.png"}" 
-                     alt="${product.item_name}" 
-                     class="showcase-product-image"
-                     loading="lazy"
-                     onerror="this.src='/assets/showcase/images/default-product.png'">
-                <div class="showcase-product-title">${product.item_name}</div>
-                <div class="showcase-product-price">${price}</div>
-                ${
-					description
-						? `<div class="showcase-product-description">${truncatedDescription}</div>`
-						: ""
-				}
-                <div class="showcase-product-code text-muted small mt-2">${
-					product.item_code || ""
-				}</div>
-            </div>
-        `;
 	},
 
 	// Format price
@@ -302,7 +228,7 @@ showcase = {
 		return frappe.format(price, { fieldtype: "Currency" });
 	},
 
-	// Show product details in modal
+	// Show product details on page
 	showProductDetails: function (productId) {
 		this.currentProductId = productId;
 		this.showLoading();
@@ -315,8 +241,8 @@ showcase = {
 			callback: function (r) {
 				showcase.hideLoading();
 				if (r.message) {
-					showcase.renderProductModal(r.message);
-					$("#productDetailModal").modal("show");
+					showcase.renderProductDetail(r.message);
+					$("#product-detail").show();
 				}
 			},
 			error: function () {
@@ -326,53 +252,72 @@ showcase = {
 		});
 	},
 
-	// Render product modal content
-	renderProductModal: function (product) {
-		const modalContent = $("#productDetailContent");
+	// Render product detail on page
+	renderProductDetail: function (product) {
+		const detailContainer = $("#product-detail");
 		const price = this.formatPrice(product.standard_rate);
 
 		const content = `
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <img src="${product.image || "/assets/showcase/images/default-product.png"}" 
                          alt="${product.item_name}" 
-                         class="img-fluid rounded"
-                         style="max-height: 300px; object-fit: cover;"
+                         class="product-detail-image"
                          onerror="this.src='/assets/showcase/images/default-product.png'">
                 </div>
-                <div class="col-md-6">
-                    <h4>${product.item_name}</h4>
-                    <p class="text-muted">${product.item_code || ""}</p>
-                    <div class="mb-3">
-                        <span class="h5 text-danger font-weight-bold">${price}</span>
-                    </div>
+                <div class="col-md-7">
+                    <div class="product-detail-title">${product.item_name}</div>
+                    <div class="product-detail-code">${product.item_code || ""}</div>
+                    <div class="product-detail-price">${price}</div>
                     ${
 						product.description
-							? `<div class="mb-3"><strong>Description:</strong><br>${product.description}</div>`
+							? `<div class="product-detail-description">${product.description}</div>`
 							: ""
 					}
-                    ${
-						product.item_group
-							? `<div class="mb-2"><strong>Category:</strong> ${product.item_group}</div>`
-							: ""
-					}
-                    ${
-						product.brand
-							? `<div class="mb-2"><strong>Brand:</strong> ${product.brand}</div>`
-							: ""
-					}
-                    ${
-						product.weight_per_unit
-							? `<div class="mb-2"><strong>Weight:</strong> ${
-									product.weight_per_unit
-							  } ${product.weight_uom || "kg"}</div>`
-							: ""
-					}
+                    
+                    <div class="product-detail-info">
+                        ${
+							product.item_group
+								? `<div class="info-item">
+                                    <span class="info-label">หมวดหมู่:</span>
+                                    <span class="info-value">${product.item_group}</span>
+                                </div>`
+								: ""
+						}
+                        ${
+							product.brand
+								? `<div class="info-item">
+                                    <span class="info-label">แบรนด์:</span>
+                                    <span class="info-value">${product.brand}</span>
+                                </div>`
+								: ""
+						}
+                        ${
+							product.weight_per_unit
+								? `<div class="info-item">
+                                    <span class="info-label">น้ำหนัก:</span>
+                                    <span class="info-value">${product.weight_per_unit} ${
+										product.weight_uom || "kg"
+								  }</span>
+                                </div>`
+								: ""
+						}
+                        ${
+							product.stock_qty !== undefined
+								? `<div class="info-item">
+                                    <span class="info-label">คงเหลือ:</span>
+                                    <span class="info-value">${product.stock_qty || 0} ${
+										product.stock_uom || "หน่วย"
+								  }</span>
+                                </div>`
+								: ""
+						}
+                    </div>
                 </div>
             </div>
         `;
 
-		modalContent.html(content);
+		detailContainer.html(content);
 	},
 
 	// View full details in ERPNext form

@@ -5,4 +5,4 @@ alwaysApply: true
 ---
 
 - this is app for erpnext frappe for
-- ui use frappe-ui
+- ui use frappe-ui for all component
