@@ -51,6 +51,66 @@ showcase = {
 				showcase.hideSuggestions();
 			}
 		});
+
+		// Handle image errors
+		$(document).on("error", "img", function () {
+			this.src = "/assets/showcase/images/default-product.png";
+		});
+
+		// Add diagnostic button (for debugging)
+		this.addDiagnosticButton();
+	},
+
+	// Add diagnostic button for debugging
+	addDiagnosticButton: function () {
+		// Add a small diagnostic button (only visible in development)
+		if (frappe.user.has_role("System Manager")) {
+			const diagnosticBtn = $(
+				'<button class="btn btn-sm btn-warning ml-2" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">🔍 Debug</button>'
+			);
+			diagnosticBtn.click(() => this.runDiagnostic());
+			$(".showcase-container").append(diagnosticBtn);
+		}
+	},
+
+	// Run diagnostic test
+	runDiagnostic: function () {
+		const query = $("#product-search").val() || "test";
+
+		frappe.call({
+			method: "showcase.api.products.diagnose_search_issue",
+			args: { query: query },
+			callback: function (r) {
+				if (r.message) {
+					console.log("Diagnostic Results:", r.message);
+					showcase.showDiagnosticResults(r.message);
+				}
+			},
+		});
+	},
+
+	// Show diagnostic results
+	showDiagnosticResults: function (results) {
+		const modal = $(`
+			<div class="modal fade" id="diagnosticModal" tabindex="-1">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">Search Diagnostic Results</h5>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						<div class="modal-body">
+							<pre>${JSON.stringify(results, null, 2)}</pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		`);
+
+		modal.modal("show");
+		modal.on("hidden.bs.modal", function () {
+			modal.remove();
+		});
 	},
 
 	// Setup search with debouncing for performance
@@ -156,9 +216,7 @@ showcase = {
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
-                        <img src="${
-							product.image || "/assets/showcase/images/default-product.png"
-						}" 
+                        <img src="${this.getSafeImageUrl(product.image)}" 
                              alt="${product.item_name}" 
                              class="mr-3"
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
@@ -175,6 +233,26 @@ showcase = {
 
 		suggestionsContainer.show();
 		this.hideSearchLoading();
+	},
+
+	// Get safe image URL
+	getSafeImageUrl: function (imageUrl) {
+		if (!imageUrl) {
+			return "/assets/showcase/images/default-product.png";
+		}
+
+		// If it's already a full URL, return as is
+		if (imageUrl.startsWith("http")) {
+			return imageUrl;
+		}
+
+		// If it's a relative path, make it absolute
+		if (imageUrl.startsWith("/")) {
+			return imageUrl;
+		}
+
+		// Default fallback
+		return "/assets/showcase/images/default-product.png";
 	},
 
 	// Hide search suggestions
@@ -260,7 +338,7 @@ showcase = {
 		const content = `
             <div class="row">
                 <div class="col-md-5">
-                    <img src="${product.image || "/assets/showcase/images/default-product.png"}" 
+                    <img src="${this.getSafeImageUrl(product.image)}" 
                          alt="${product.item_name}" 
                          class="product-detail-image"
                          onerror="this.src='/assets/showcase/images/default-product.png'">
