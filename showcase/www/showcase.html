@@ -73,13 +73,8 @@ block page_content %}
 				<div class="empty-state-icon">
 					<i class="fa fa-search"></i>
 				</div>
-				<h4>{{ _("No products found") }}</h4>
-				<p class="text-muted">
-					{{ _("Try adjusting your search criteria or browse all products.") }}
-				</p>
-				<button class="btn btn-outline-primary" onclick="showcase.loadProducts()">
-					{{ _("Show All Products") }}
-				</button>
+				<h4>{{ _("ไม่พบสินค้า") }}</h4>
+				<p class="text-muted">{{ _("ลองปรับปรุงการคำค้นหา หรือค้นหาจากรหัสสินค้า") }}</p>
 			</div>
 		</div>
 	</div>
@@ -152,10 +147,11 @@ block page_content %}
 	}
 
 	.search-input-wrapper {
+		text-align: center;
 		position: relative;
-		background: white;
+		/* background: white; */
 		border-radius: 50px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		/* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); */
 		overflow: hidden;
 		transition: all 0.3s ease;
 		border: 1px solid #e0e0e0;
@@ -163,6 +159,7 @@ block page_content %}
 
 	.search-input-wrapper:focus-within {
 		/* box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); */
+		background-color: white;
 	}
 
 	.search-icon {
