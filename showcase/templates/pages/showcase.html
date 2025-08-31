@@ -1,115 +1,114 @@
-{% extends "templates/web.html" %}
-
-{% block title %}{{ _("ERPNext Showcase") }}{% endblock %}
-
-{% block page_content %}
+{% extends "templates/web.html" %} {% block title %}{{ _("ERPNext Showcase") }}{% endblock %} {%
+block page_content %}
 <div class="showcase-container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="text-center mb-4">{{ _("ERPNext Showcase") }}</h1>
-            <p class="text-center text-muted mb-4">{{ _("Browse and search products by name or scan barcode") }}</p>
-        </div>
-    </div>
+	<div class="row">
+		<div class="col-md-12">
+			<h1 class="text-center mb-4">{{ _("ERPNext Showcase") }}</h1>
+			<p class="text-center text-muted mb-4">
+				{{ _("Browse and search products by name or scan barcode") }}
+			</p>
+		</div>
+	</div>
 
-    <!-- Search Section -->
-    <div class="row mb-4">
-        <div class="col-md-8 mx-auto">
-            <div class="showcase-search">
-                <div class="input-group">
-                    <input type="text" 
-                           class="form-control" 
-                           placeholder="{{ _('Search products by name or code...') }}"
-                           id="product-search">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" 
-                                type="button" 
-                                onclick="showcase.scanBarcode()">
-                            <i class="fa fa-barcode"></i> {{ _("Scan") }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<!-- Search Section -->
+	<div class="row mb-4">
+		<div class="col-md-8 mx-auto">
+			<div class="showcase-search">
+				<div class="input-group">
+					<input
+						type="text"
+						class="form-control"
+						placeholder="{{ _('Search products by name or code...') }}"
+						id="product-search"
+					/>
+					<div class="input-group-append">
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							onclick="showcase.scanBarcode()"
+						>
+							<i class="fa fa-barcode"></i> {{ _("Scan") }}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <!-- Products Grid -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="showcase-product-grid" id="products-grid">
-                <!-- Products will be loaded here dynamically -->
-            </div>
-        </div>
-    </div>
+	<!-- Products Grid -->
+	<div class="row">
+		<div class="col-md-12">
+			<div class="showcase-product-grid" id="products-grid">
+				<!-- Products will be loaded here dynamically -->
+			</div>
+		</div>
+	</div>
 
-    <!-- No Products Message -->
-    <div class="row" id="no-products" style="display: none;">
-        <div class="col-md-12 text-center">
-            <div class="alert alert-info">
-                <i class="fa fa-info-circle"></i>
-                {{ _("No products found. Try adjusting your search criteria.") }}
-            </div>
-        </div>
-    </div>
+	<!-- No Products Message -->
+	<div class="row" id="no-products" style="display: none">
+		<div class="col-md-12 text-center">
+			<div class="alert alert-info">
+				<i class="fa fa-info-circle"></i>
+				{{ _("No products found. Try adjusting your search criteria.") }}
+			</div>
+		</div>
+	</div>
 </div>
-{% endblock %}
-
-{% block style %}
+{% endblock %} {% block style %}
 <style>
-/* Additional custom styles for showcase */
-.showcase-container {
-    min-height: 60vh;
-}
+	/* Additional custom styles for showcase */
+	.showcase-container {
+		min-height: 60vh;
+	}
 
-.showcase-product-grid {
-    min-height: 200px;
-}
+	.showcase-product-grid {
+		min-height: 200px;
+	}
 
-.showcase-product-card {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+	.showcase-product-card {
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
 
-.showcase-product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
+	.showcase-product-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+	}
 
-.showcase-product-image {
-    transition: transform 0.3s ease;
-}
+	.showcase-product-image {
+		transition: transform 0.3s ease;
+	}
 
-.showcase-product-card:hover .showcase-product-image {
-    transform: scale(1.05);
-}
+	.showcase-product-card:hover .showcase-product-image {
+		transform: scale(1.05);
+	}
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .showcase-container {
-        padding: 10px;
-    }
-    
-    .showcase-product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-    }
-    
-    .showcase-product-card {
-        padding: 10px;
-    }
-    
-    .showcase-product-image {
-        height: 120px;
-    }
-}
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.showcase-container {
+			padding: 10px;
+		}
+
+		.showcase-product-grid {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 10px;
+		}
+
+		.showcase-product-card {
+			padding: 10px;
+		}
+
+		.showcase-product-image {
+			height: 120px;
+		}
+	}
 </style>
-{% endblock %}
-
-{% block script %}
+{% endblock %} {% block script %}
 <script>
-// Initialize showcase when page loads
-$(document).ready(function() {
-    // Load initial products
-    showcase.loadProducts();
-});
+	// Initialize showcase when page loads
+	$(document).ready(function () {
+		// Load initial products
+		showcase.loadProducts();
+	});
 </script>
 {% endblock %}
