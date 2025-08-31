@@ -34,7 +34,7 @@ web_include_css = "/assets/showcase/css/showcase.css"
 web_include_js = "/assets/showcase/js/showcase.js"
 
 # include custom scss in every website theme (without file extension ".scss")
-website_theme_scss = "showcase/public/scss/website"
+# website_theme_scss = "showcase/public/scss/website"
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
