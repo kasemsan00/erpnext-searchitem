@@ -33,6 +33,20 @@ app_include_js = "/assets/showcase/js/showcase.js"
 web_include_css = "/assets/showcase/css/showcase.css"
 web_include_js = "/assets/showcase/js/showcase.js"
 
+# For development: disable JS caching by adding version parameter
+import frappe
+import time
+
+def get_js_with_version():
+    if frappe.conf.get("developer_mode"):
+        return f"/assets/showcase/js/showcase.js?v={int(time.time())}"
+    return "/assets/showcase/js/showcase.js"
+
+# Override JS includes in development mode
+if frappe.conf.get("developer_mode"):
+    app_include_js = get_js_with_version()
+    web_include_js = get_js_with_version()
+
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "showcase/public/scss/website"
 
