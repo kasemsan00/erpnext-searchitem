@@ -23,7 +23,7 @@ showcase = {
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log("Key pressed xx:", e.key);
+			console.log("Key pressed kasemsan:", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
