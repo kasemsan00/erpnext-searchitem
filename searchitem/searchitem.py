@@ -11,24 +11,24 @@ import frappe
 from frappe import _
 
 def get_context(context):
-    """Get context for showcase pages"""
+    """Get context for searchitem pages"""
     context.update({
         "title": _("Search item"),
-        "showcase_products": get_showcase_products()
+        "searchitem_products": get_searchitem_products()
     })
 
-def get_showcase_products():
-    """Get products for showcase display"""
+def get_searchitem_products():
+    """Get products for searchitem display"""
     try:
         products = frappe.get_all(
             "Item",
-            filters={"show_in_showcase": 1, "disabled": 0},
+            filters={"show_in_searchitem": 1, "disabled": 0},
             fields=["name", "item_name", "item_code", "image", "description"],
             limit=20
         )
         return products
     except Exception as e:
-        frappe.log_error(f"Error fetching showcase products: {str(e)}")
+        frappe.log_error(f"Error fetching searchitem products: {str(e)}")
         return []
 
 def search_products(search_term):

@@ -1,14 +1,13 @@
-exclude: 'node_modules|.git'
+exclude: "node_modules|.git"
 default_stages: [pre-commit]
 fail_fast: false
-
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        files: "showcase.*"
+        files: "searchitem.*"
         exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
       - id: check-merge-conflict
       - id: check-ast
@@ -37,33 +36,32 @@ repos:
         types_or: [javascript, vue, scss]
         # Ignore any files that might contain jinja / bundles
         exclude: |
-            (?x)^(
-                showcase/public/dist/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                showcase/templates/includes/.*|
-                showcase/public/js/lib/.*
-            )$
-
+          (?x)^(
+              searchitem/public/dist/.*|
+              .*node_modules.*|
+              .*boilerplate.*|
+              searchitem/templates/includes/.*|
+              searchitem/public/js/lib/.*
+          )$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.44.0
     hooks:
       - id: eslint
         types_or: [javascript]
-        args: ['--quiet']
+        args: ["--quiet"]
         # Ignore any files that might contain jinja / bundles
         exclude: |
-            (?x)^(
-                showcase/public/dist/.*|
-                cypress/.*|
-                .*node_modules.*|
-                .*boilerplate.*|
-                showcase/templates/includes/.*|
-                showcase/public/js/lib/.*
-            )$
+          (?x)^(
+              searchitem/public/dist/.*|
+              cypress/.*|
+              .*node_modules.*|
+              .*boilerplate.*|
+              searchitem/templates/includes/.*|
+              searchitem/public/js/lib/.*
+          )$
 
 ci:
-    autoupdate_schedule: weekly
-    skip: []
-    submodules: false
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

@@ -4,7 +4,7 @@ from frappe import _
 @frappe.whitelist()
 def get_products(limit=50, offset=0):
     """
-    Get products for showcase with performance optimizations
+    Get products for searchitem with performance optimizations
     """
     try:
         # Use optimized query with specific fields only
@@ -30,7 +30,7 @@ def get_products(limit=50, offset=0):
         return products
         
     except Exception as e:
-        frappe.log_error(f"Showcase API Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem API Error: {str(e)}", "Searchitem API")
         return []
 
 @frappe.whitelist()
@@ -110,7 +110,7 @@ def search_products(query, limit=20):
         return products
         
     except Exception as e:
-        frappe.log_error(f"Showcase Search Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Search Error: {str(e)}", "Searchitem API")
         return []
 
 @frappe.whitelist()
@@ -181,7 +181,7 @@ def get_product_by_code(item_code):
         return products
         
     except Exception as e:
-        frappe.log_error(f"Showcase Item Code Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Item Code Error: {str(e)}", "Searchitem API")
         return []
 
 @frappe.whitelist()
@@ -248,7 +248,7 @@ def get_product_details(product_id):
         return details
         
     except Exception as e:
-        frappe.log_error(f"Showcase Product Details Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Product Details Error: {str(e)}", "Searchitem API")
         return None
 
 @frappe.whitelist()
@@ -291,7 +291,7 @@ def get_product_by_barcode(barcode):
         return product
         
     except Exception as e:
-        frappe.log_error(f"Showcase Barcode Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Barcode Error: {str(e)}", "Searchitem API")
         return None
 
 @frappe.whitelist()
@@ -444,7 +444,7 @@ def search_product_unified(query):
         return []
         
     except Exception as e:
-        frappe.log_error(f"Showcase Unified Search Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Unified Search Error: {str(e)}", "Searchitem API")
         frappe.logger().debug(f"Unified search error: {str(e)}")
         return []
 
@@ -524,7 +524,7 @@ def diagnose_image_issue(item_code=None):
         return result
         
     except Exception as e:
-        frappe.log_error(f"Image Diagnosis Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Image Diagnosis Error: {str(e)}", "Searchitem API")
         return {"error": str(e)}
 
 @frappe.whitelist()
@@ -745,7 +745,7 @@ def diagnose_search_issue(query):
         return diagnosis
         
     except Exception as e:
-        frappe.log_error(f"Diagnosis Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Diagnosis Error: {str(e)}", "Searchitem API")
         return {"error": str(e)}
 
 def get_safe_image_url(image_field):
@@ -802,6 +802,6 @@ def get_safe_image_url(image_field):
         
     except Exception as e:
         # Log error but don't break the search
-        frappe.log_error(f"Image URL Error for '{image_field}': {str(e)}", "Showcase API")
+        frappe.log_error(f"Image URL Error for '{image_field}': {str(e)}", "Searchitem API")
         frappe.logger().debug(f"Failed to process image field: '{image_field}', error: {str(e)}")
         return None

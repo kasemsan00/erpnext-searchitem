@@ -1,7 +1,7 @@
 /* Search item App Styles - Additional styles */
 
 /* Override any conflicting styles from the template */
-.showcase-container {
+.searchitem-container {
 	padding: 0 !important;
 }
 
@@ -12,21 +12,21 @@
 
 /* Additional responsive improvements */
 @media (max-width: 576px) {
-	.showcase-search-container {
+	.searchitem-search-container {
 		margin-bottom: 1rem;
 	}
 
-	.showcase-product-grid {
+	.searchitem-product-grid {
 		gap: 1rem;
 	}
 
-	.showcase-product-card {
+	.searchitem-product-card {
 		padding: 1rem;
 	}
 }
 
 /* Loading animation improvements */
-.showcase-loading .spinner-border {
+.searchitem-loading .spinner-border {
 	width: 3rem;
 	height: 3rem;
 }
@@ -43,24 +43,24 @@
 }
 
 /* Accessibility improvements */
-.showcase-product-card:focus {
+.searchitem-product-card:focus {
 	outline: 2px solid #667eea;
 	outline-offset: 2px;
 }
 
-.showcase-search-input:focus {
+.searchitem-search-input:focus {
 	outline: none;
 }
 
 /* Print styles */
 @media print {
-	.showcase-header,
-	.showcase-search-container,
-	.showcase-scan-btn {
+	.searchitem-header,
+	.searchitem-search-container,
+	.searchitem-scan-btn {
 		display: none !important;
 	}
 
-	.showcase-product-card {
+	.searchitem-product-card {
 		break-inside: avoid;
 		box-shadow: none !important;
 		border: 1px solid #ddd !important;

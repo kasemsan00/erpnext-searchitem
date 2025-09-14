@@ -10,7 +10,7 @@ import re
 def get_version():
     """Get version from __init__.py"""
     try:
-        version_file = os.path.join(os.path.dirname(__file__), "showcase", "__init__.py")
+        version_file = os.path.join(os.path.dirname(__file__), "searchitem", "__init__.py")
         with open(version_file, "r") as f:
             version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M)
             if version_match:
@@ -20,7 +20,7 @@ def get_version():
     return "1.0.0"
 
 # App metadata
-APP_NAME = "showcase"
+APP_NAME = "searchitem"
 APP_VERSION = get_version()
 APP_DESCRIPTION = "Search item - Show products by scan barcode or search by name"
 APP_AUTHOR = "kasemsan"

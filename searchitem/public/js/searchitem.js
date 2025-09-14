@@ -1,15 +1,14 @@
 // Search item App JavaScript
 
-frappe.provide("showcase");
+frappe.provide("searchitem");
 
 // Debug: Check if frappe is available
-console.log("Showcase JS loaded. Frappe available:", typeof frappe !== "undefined");
+console.log("Searchitem JS loaded. Frappe available:", typeof frappe !== "undefined");
 
-showcase = {
-
+searchitem = {
 	searchKeyword: "",
 
-	// Initialize the showcase app
+	// Initialize the searchitem app
 	init: function () {
 		this.bindEvents();
 		this.setupSearch();
@@ -21,9 +20,9 @@ showcase = {
 	bindEvents: function () {
 		// Search input events - only update search keyword, no automatic search
 		$(document).on("input", "#product-search", function () {
-			showcase.searchKeyword = $(this).val();
+			searchitem.searchKeyword = $(this).val();
 			// Hide suggestions when typing (no automatic search)
-			showcase.hideSuggestions();
+			searchitem.hideSuggestions();
 		});
 
 		// Enter key for item code search
@@ -32,34 +31,34 @@ showcase = {
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
-				showcase.handleEnterKey($(this).val());
+				searchitem.handleEnterKey($(this).val());
 			}
 		});
 
 		// Search suggestion clicks
 		$(document).on("click", ".suggestion-item", function () {
 			const productId = $(this).data("product-id");
-			showcase.showProductDetails(productId);
-			showcase.hideSuggestions();
+			searchitem.showProductDetails(productId);
+			searchitem.hideSuggestions();
 		});
 
 		// Modal events
 		$(document).on("click", "#viewFullDetails", function () {
-			if (showcase.currentProductId) {
-				showcase.viewFullDetails(showcase.currentProductId);
+			if (searchitem.currentProductId) {
+				searchitem.viewFullDetails(searchitem.currentProductId);
 			}
 		});
 
 		// Close suggestions when clicking outside
 		$(document).on("click", function (e) {
-			if (!$(e.target).closest(".showcase-search-container").length) {
-				showcase.hideSuggestions();
+			if (!$(e.target).closest(".searchitem-search-container").length) {
+				searchitem.hideSuggestions();
 			}
 		});
 
 		// Handle image errors
 		$(document).on("error", "img", function () {
-			this.src = "/assets/showcase/images/default-product.png";
+			this.src = "/assets/searchitem/images/default-product.png";
 		});
 
 		// Add diagnostic button (for debugging)
@@ -70,27 +69,29 @@ showcase = {
 	addDiagnosticButton: function () {
 		// Add a small diagnostic button (only visible in development)
 		if (frappe.user.has_role("System Manager")) {
-			const diagnosticContainer = $('<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>');
-			
+			const diagnosticContainer = $(
+				'<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>'
+			);
+
 			const searchDiagnosticBtn = $(
 				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
 			);
 			searchDiagnosticBtn.click(() => this.runDiagnostic());
-			
+
 			const imageDiagnosticBtn = $(
 				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
 			);
 			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
-			
+
 			const unifiedSearchTestBtn = $(
 				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
 			);
 			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
-			
+
 			diagnosticContainer.append(searchDiagnosticBtn);
 			diagnosticContainer.append(imageDiagnosticBtn);
 			diagnosticContainer.append(unifiedSearchTestBtn);
-			$(".showcase-container").append(diagnosticContainer);
+			$(".searchitem-container").append(diagnosticContainer);
 		}
 	},
 
@@ -99,12 +100,12 @@ showcase = {
 		const query = $("#product-search").val() || "test";
 
 		frappe.call({
-			method: "showcase.api.products.diagnose_search_issue",
+			method: "searchitem.api.products.diagnose_search_issue",
 			args: { query: query },
 			callback: function (r) {
 				if (r.message) {
 					console.log("Search Diagnostic Results:", r.message);
-					showcase.showDiagnosticResults(r.message, "Search Diagnostic Results");
+					searchitem.showDiagnosticResults(r.message, "Search Diagnostic Results");
 				}
 			},
 		});
@@ -115,12 +116,12 @@ showcase = {
 		const itemCode = $("#product-search").val() || null;
 
 		frappe.call({
-			method: "showcase.api.products.diagnose_image_issue",
+			method: "searchitem.api.products.diagnose_image_issue",
 			args: { item_code: itemCode },
 			callback: function (r) {
 				if (r.message) {
 					console.log("Image Diagnostic Results:", r.message);
-					showcase.showDiagnosticResults(r.message, "Image Diagnostic Results");
+					searchitem.showDiagnosticResults(r.message, "Image Diagnostic Results");
 				}
 			},
 		});
@@ -131,12 +132,12 @@ showcase = {
 		const query = $("#product-search").val() || "test";
 
 		frappe.call({
-			method: "showcase.api.products.test_unified_search",
+			method: "searchitem.api.products.test_unified_search",
 			args: { query: query },
 			callback: function (r) {
 				if (r.message) {
 					console.log("Unified Search Test Results:", r.message);
-					showcase.showDiagnosticResults(r.message, "Unified Search Test Results");
+					searchitem.showDiagnosticResults(r.message, "Unified Search Test Results");
 				}
 			},
 		});
@@ -193,23 +194,23 @@ showcase = {
 		this.hideSuggestions();
 
 		frappe.call({
-			method: "showcase.api.products.get_product_by_code",
+			method: "searchitem.api.products.get_product_by_code",
 			args: {
 				item_code: itemCode,
 			},
 			callback: function (r) {
-				showcase.hideLoading();
+				searchitem.hideLoading();
 				if (r.message && r.message.length > 0) {
 					// Show the first product details directly
-					showcase.showProductDetails(r.message[0].name);
+					searchitem.showProductDetails(r.message[0].name);
 				} else {
-					showcase.showNoProducts();
+					searchitem.showNoProducts();
 					frappe.show_alert(__("No product found with code: {0}", [itemCode]), 3);
 				}
 			},
 			error: function () {
-				showcase.hideLoading();
-				showcase.showNoProducts();
+				searchitem.hideLoading();
+				searchitem.showNoProducts();
 			},
 		});
 	},
@@ -217,20 +218,20 @@ showcase = {
 	// Perform unified search with suggestions (for typing)
 	performUnifiedSearch: function (query) {
 		frappe.call({
-			method: "showcase.api.products.search_product_unified",
+			method: "searchitem.api.products.search_product_unified",
 			args: {
 				query: query,
 			},
 			callback: function (r) {
 				if (r.message && r.message.length > 0) {
 					console.log("Unified search results:", r.message);
-					showcase.showSearchSuggestions(r.message);
+					searchitem.showSearchSuggestions(r.message);
 				} else {
-					showcase.hideSuggestions();
+					searchitem.hideSuggestions();
 				}
 			},
 			error: function () {
-				showcase.hideSearchLoading();
+				searchitem.hideSearchLoading();
 			},
 		});
 	},
@@ -242,24 +243,24 @@ showcase = {
 		this.hideSuggestions();
 
 		frappe.call({
-			method: "showcase.api.products.search_product_unified",
+			method: "searchitem.api.products.search_product_unified",
 			args: {
 				query: query,
 			},
 			callback: function (r) {
-				showcase.hideLoading();
+				searchitem.hideLoading();
 				if (r.message && r.message.length > 0) {
 					console.log("Direct unified search results:", r.message);
 					// Show the first product details directly
-					showcase.showProductDetails(r.message[0].name);
+					searchitem.showProductDetails(r.message[0].name);
 				} else {
-					showcase.showNoProducts();
+					searchitem.showNoProducts();
 					frappe.show_alert(__("No product found for: {0}", [query]), 3);
 				}
 			},
 			error: function () {
-				showcase.hideLoading();
-				showcase.showNoProducts();
+				searchitem.hideLoading();
+				searchitem.showNoProducts();
 			},
 		});
 	},
@@ -267,18 +268,18 @@ showcase = {
 	// Perform search with suggestions (legacy method - kept for compatibility)
 	performSearch: function (query) {
 		frappe.call({
-			method: "showcase.api.products.search_products",
+			method: "searchitem.api.products.search_products",
 			args: {
 				query: query,
 				limit: 10, // Limit for suggestions
 			},
 			callback: function (r) {
 				if (r.message) {
-					showcase.showSearchSuggestions(r.message);
+					searchitem.showSearchSuggestions(r.message);
 				}
 			},
 			error: function () {
-				showcase.hideSearchLoading();
+				searchitem.hideSearchLoading();
 			},
 		});
 	},
@@ -295,10 +296,11 @@ showcase = {
 
 		products.forEach((product) => {
 			// Add search method indicator for debugging (only for System Managers)
-			const searchMethodBadge = product.search_method && frappe.user.has_role("System Manager") 
-				? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>` 
-				: '';
-			
+			const searchMethodBadge =
+				product.search_method && frappe.user.has_role("System Manager")
+					? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
+					: "";
+
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
@@ -306,9 +308,11 @@ showcase = {
                              alt="${product.item_name}" 
                              class="mr-3"
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
-                             onerror="this.src='/assets/showcase/images/default-product.png'">
+                             onerror="this.src='/assets/searchitem/images/default-product.png'">
                         <div class="flex-grow-1">
-                            <div class="font-weight-bold">${product.item_name}${searchMethodBadge}</div>
+                            <div class="font-weight-bold">${
+								product.item_name
+							}${searchMethodBadge}</div>
                             <div class="text-muted small">${product.item_code || ""}</div>
                         </div>
                     </div>
@@ -324,7 +328,7 @@ showcase = {
 	// Get safe image URL
 	getSafeImageUrl: function (imageUrl) {
 		if (!imageUrl) {
-			return "/assets/showcase/images/default-product.png";
+			return "/assets/searchitem/images/default-product.png";
 		}
 
 		// If it's already a full URL, return as is
@@ -338,7 +342,7 @@ showcase = {
 		}
 
 		// Default fallback
-		return "/assets/showcase/images/default-product.png";
+		return "/assets/searchitem/images/default-product.png";
 	},
 
 	// Hide search suggestions
@@ -349,9 +353,7 @@ showcase = {
 	// Show search loading
 	showSearchLoading: function () {
 		const suggestionsContainer = $("#search-suggestions");
-		suggestionsContainer.html(
-			'<div class="p-3 text-center text-muted">Searching...</div>'
-		);
+		suggestionsContainer.html('<div class="p-3 text-center text-muted">Searching...</div>');
 		suggestionsContainer.show();
 	},
 
@@ -398,20 +400,20 @@ showcase = {
 		this.showLoading();
 
 		frappe.call({
-			method: "showcase.api.products.get_product_details",
+			method: "searchitem.api.products.get_product_details",
 			args: {
 				product_id: productId,
 			},
 			callback: function (r) {
 				console.log("showProductDetails: ", r);
-				showcase.hideLoading();
+				searchitem.hideLoading();
 				if (r.message) {
-					showcase.renderProductDetail(r.message);
+					searchitem.renderProductDetail(r.message);
 					$("#product-detail").show();
 				}
 			},
 			error: function () {
-				showcase.hideLoading();
+				searchitem.hideLoading();
 				frappe.show_alert(__("Error loading product details"), 3);
 			},
 		});
@@ -423,7 +425,7 @@ showcase = {
 		const detailContainer = $("#product-detail .product-card");
 		const price = this.formatPrice(product.standard_rate);
 		const imageUrl = this.getSafeImageUrl(product.image);
-		const defaultImage = "/assets/showcase/images/default-product.png";
+		const defaultImage = "/assets/searchitem/images/default-product.png";
 
 		// Stock status indicator
 		const stockStatus = this.getStockStatus(product.stock_qty);
@@ -441,7 +443,7 @@ showcase = {
 					<img src="${imageUrl}" 
 						 alt="${product.item_name}" 
 						 class="product-detail-image"
-						 onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
+						 onclick="searchitem.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
 						 onerror="this.src='${defaultImage}'">
 					<div class="image-overlay">
 						คลิกเพื่อขยาย
@@ -452,7 +454,7 @@ showcase = {
 					<div class="product-details-simple">
 						<div class="detail-row">
 							<span class="detail-label">ชื่อสินค้า:</span>
-							<span class="detail-value">${product.item_name }</span>
+							<span class="detail-value">${product.item_name}</span>
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">รหัสบาร์โค้ด:</span>
@@ -464,30 +466,42 @@ showcase = {
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">คงเหลือ:</span>
-							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}</span>
+							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${
+			product.stock_uom || "หน่วย"
+		}</span>
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">หมวดหมู่:</span>
 							<span class="detail-value">${product.item_group || "ไม่ระบุ"}</span>
 						</div>
-						${product.brand ? `
+						${
+							product.brand
+								? `
 						<div class="detail-row">
 							<span class="detail-label">แบรนด์:</span>
 							<span class="detail-value">${product.brand}</span>
-						</div>` : ''}
-						${product.weight_per_unit ? `
+						</div>`
+								: ""
+						}
+						${
+							product.weight_per_unit
+								? `
 						<div class="detail-row">
 							<span class="detail-label">น้ำหนัก:</span>
 							<span class="detail-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</span>
-						</div>` : ''}
+						</div>`
+								: ""
+						}
 					</div>
 				</div>
 				
 				<div class="product-actions">
-					<button class="btn btn-success action-btn" onclick="showcase.printProductInfo()">
+					<button class="btn btn-success action-btn" onclick="searchitem.printProductInfo()">
 						พิมพ์ข้อมูล
 					</button>
-					<button class="btn btn-warning action-btn" onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')">
+					<button class="btn btn-warning action-btn" onclick="searchitem.showImageModal('${imageUrl}', '${
+			product.item_name
+		}', '${product.item_code}')">
 						ดูรูปภาพ
 					</button>
 				</div>
@@ -498,7 +512,7 @@ showcase = {
 	},
 
 	// Get stock status for styling
-	getStockStatus: function(stockQty) {
+	getStockStatus: function (stockQty) {
 		const qty = parseFloat(stockQty) || 0;
 		if (qty <= 0) {
 			return { status: "out_of_stock", class: "text-danger", text: "หมด" };
@@ -510,11 +524,15 @@ showcase = {
 	},
 
 	// Get stock badge
-	getStockBadge: function(stockQty) {
+	getStockBadge: function (stockQty) {
 		const status = this.getStockStatus(stockQty);
-		const badgeClass = status.status === "out_of_stock" ? "badge-danger" : 
-						   status.status === "low_stock" ? "badge-warning" : "badge-success";
-		
+		const badgeClass =
+			status.status === "out_of_stock"
+				? "badge-danger"
+				: status.status === "low_stock"
+				? "badge-warning"
+				: "badge-success";
+
 		return `<span class="badge ${badgeClass} badge-lg">
 					Stock: ${status.text}
 				</span>`;
@@ -528,32 +546,32 @@ showcase = {
 	},
 
 	// Show image in modal (defined here for consistency)
-	showImageModal: function(imageSrc, productName, productCode) {
-		if (!imageSrc || imageSrc.includes('default-product.png')) {
+	showImageModal: function (imageSrc, productName, productCode) {
+		if (!imageSrc || imageSrc.includes("default-product.png")) {
 			frappe.show_alert(__("ไม่มีรูปภาพสำหรับสินค้านี้"), 3);
 			return;
 		}
-		
-		$('#modalImage').attr('src', imageSrc);
-		$('#imageProductName').text(productName);
-		$('#imageProductCode').text(productCode);
-		$('#imageModal').modal('show');
+
+		$("#modalImage").attr("src", imageSrc);
+		$("#imageProductName").text(productName);
+		$("#imageProductCode").text(productCode);
+		$("#imageModal").modal("show");
 	},
 
 	// Download image function (defined here for consistency)
-	downloadImage: function() {
-		const imageSrc = $('#modalImage').attr('src');
-		const productName = $('#imageProductName').text();
-		
-		if (imageSrc && !imageSrc.includes('default-product.png')) {
-			const link = document.createElement('a');
+	downloadImage: function () {
+		const imageSrc = $("#modalImage").attr("src");
+		const productName = $("#imageProductName").text();
+
+		if (imageSrc && !imageSrc.includes("default-product.png")) {
+			const link = document.createElement("a");
 			link.href = imageSrc;
-			link.download = `${productName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_image.jpg`;
-			link.target = '_blank';
+			link.download = `${productName.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_image.jpg`;
+			link.target = "_blank";
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-			
+
 			frappe.show_alert(__("กำลังดาวน์โหลดรูปภาพ..."), 2);
 		} else {
 			frappe.show_alert(__("ไม่สามารถดาวน์โหลดรูปภาพได้"), 3);
@@ -561,7 +579,7 @@ showcase = {
 	},
 
 	// Print product info function (defined here for consistency)
-	printProductInfo: function() {
+	printProductInfo: function () {
 		if (this.currentProductId) {
 			// Add print-specific styles
 			const printStyles = `
@@ -574,14 +592,14 @@ showcase = {
 					}
 				</style>
 			`;
-			
-			if (!document.getElementById('print-styles')) {
-				const style = document.createElement('style');
-				style.id = 'print-styles';
-				style.innerHTML = printStyles.replace('<style>', '').replace('</style>', '');
+
+			if (!document.getElementById("print-styles")) {
+				const style = document.createElement("style");
+				style.id = "print-styles";
+				style.innerHTML = printStyles.replace("<style>", "").replace("</style>", "");
 				document.head.appendChild(style);
 			}
-			
+
 			setTimeout(() => {
 				window.print();
 			}, 100);
@@ -591,13 +609,13 @@ showcase = {
 	},
 
 	// Clear search function (defined here for consistency)
-	clearSearch: function() {
-		$('#product-search').val('').focus();
-		this.searchKeyword = '';
+	clearSearch: function () {
+		$("#product-search").val("").focus();
+		this.searchKeyword = "";
 		this.hideSuggestions();
-		$('#product-detail').hide();
-		$('#no-products').hide();
-		$('#loading-state').hide();
+		$("#product-detail").hide();
+		$("#no-products").hide();
+		$("#loading-state").hide();
 	},
 
 	// Scan barcode functionality
@@ -616,5 +634,5 @@ showcase = {
 
 // Initialize when document is ready
 $(document).ready(function () {
-	showcase.init();
+	searchitem.init();
 });
