@@ -15,7 +15,7 @@
 
 ## การแก้ไขที่ทำ
 
-### 1. ปรับปรุงการจัดการรูปภาพ (`showcase/api/products.py`)
+### 1. ปรับปรุงการจัดการรูปภาพ (`searchitem/api/products.py`)
 
 - เพิ่มฟังก์ชัน `get_safe_image_url()` เพื่อจัดการรูปภาพอย่างปลอดภัย
 - เพิ่ม error handling เพื่อไม่ให้การค้นหาหยุดทำงานเมื่อรูปภาพมีปัญหา
@@ -33,7 +33,7 @@
 - เพิ่มปุ่ม Debug ในหน้าเว็บ (สำหรับ System Manager)
 - เพิ่ม logging เพื่อติดตามการทำงาน
 
-### 4. ปรับปรุง JavaScript (`showcase/public/js/showcase.js`)
+### 4. ปรับปรุง JavaScript (`searchitem/public/js/searchitem.js`)
 
 - เพิ่มฟังก์ชัน `getSafeImageUrl()` สำหรับจัดการรูปภาพ
 - เพิ่ม error handling สำหรับรูปภาพ

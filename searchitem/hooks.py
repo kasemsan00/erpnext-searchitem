@@ -1,4 +1,4 @@
-app_name = "showcase"
+app_name = "searchitem"
 app_title = "Search item"
 app_publisher = "kasemsan"
 app_description = "Show product by scan barcode or search by name"
@@ -14,11 +14,11 @@ app_version = "1.0.0"
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
 	{
-		"name": "showcase",
-		"logo": "/assets/showcase/logo.png",
+		"name": "searchitem",
+		"logo": "/assets/searchitem/logo.png",
 		"title": "Search item",
-		"route": "/showcase",
-		"has_permission": "showcase.api.permission.has_app_permission"
+		"route": "/searchitem",
+		"has_permission": "searchitem.api.permission.has_app_permission"
 	}
 ]
 
@@ -26,12 +26,12 @@ add_to_apps_screen = [
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/showcase/css/showcase.css"
-app_include_js = "/assets/showcase/js/showcase.js"
+app_include_css = "/assets/searchitem/css/searchitem.css"
+app_include_js = "/assets/searchitem/js/searchitem.js"
 
 # include js, css files in header of web template
-web_include_css = "/assets/showcase/css/showcase.css"
-web_include_js = "/assets/showcase/js/showcase.js"
+web_include_css = "/assets/searchitem/css/searchitem.css"
+web_include_js = "/assets/searchitem/js/searchitem.js"
 
 # For development: disable JS caching by adding version parameter
 import frappe
@@ -39,8 +39,8 @@ import time
 
 def get_js_with_version():
     if frappe.conf.get("developer_mode"):
-        return f"/assets/showcase/js/showcase.js?v={int(time.time())}"
-    return "/assets/showcase/js/showcase.js"
+        return f"/assets/searchitem/js/searchitem.js?v={int(time.time())}"
+    return "/assets/searchitem/js/searchitem.js"
 
 # Override JS includes in development mode
 if frappe.conf.get("developer_mode"):
@@ -48,14 +48,14 @@ if frappe.conf.get("developer_mode"):
     web_include_js = get_js_with_version()
 
 # include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "showcase/public/scss/website"
+# website_theme_scss = "searchitem/public/scss/website"
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-page_js = {"showcase" : "public/js/showcase.js"}
+page_js = {"searchitem" : "public/js/searchitem.js"}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -66,7 +66,7 @@ page_js = {"showcase" : "public/js/showcase.js"}
 # Svg Icons
 # ------------------
 # include app icons in desk
-# app_include_icons = "showcase/public/icons.svg"
+# app_include_icons = "searchitem/public/icons.svg"
 
 # Home Pages
 # ----------
@@ -90,34 +90,34 @@ page_js = {"showcase" : "public/js/showcase.js"}
 
 # add methods and filters to jinja environment
 # jinja = {
-# 	"methods": "showcase.utils.jinja_methods",
-# 	"filters": "showcase.utils.jinja_filters"
+# 	"methods": "searchitem.utils.jinja_methods",
+# 	"filters": "searchitem.utils.jinja_filters"
 # }
 
 # Installation
 # ------------
 
-# before_install = "showcase.install.before_install"
-# after_install = "showcase.install.after_install"
+# before_install = "searchitem.install.before_install"
+# after_install = "searchitem.install.after_install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "showcase.uninstall.before_uninstall"
-# after_uninstall = "showcase.uninstall.after_uninstall"
+# before_uninstall = "searchitem.uninstall.before_uninstall"
+# after_uninstall = "searchitem.uninstall.after_uninstall"
 
 # Integration Setup
 # ------------------
 # To set up dependencies/integrations with other apps
 # Name of the app being installed is passed as an argument
 
-# before_app_install = "showcase.utils.before_app_install"
-# after_app_install = "showcase.utils.after_app_install"
+# before_app_install = "searchitem.utils.before_app_install"
+# after_app_install = "searchitem.utils.after_app_install"
 
 # Migration
 # ------------
-# before_migrate = "showcase.utils.before_migrate"
-# after_migrate = "showcase.utils.after_migrate"
+# before_migrate = "searchitem.utils.before_migrate"
+# after_migrate = "searchitem.utils.after_migrate"
 
 # Permissions
 # ------------
@@ -148,32 +148,32 @@ page_js = {"showcase" : "public/js/showcase.js"}
 
 # scheduler_events = {
 # 	"all": [
-# 		"showcase.tasks.all"
+# 		"searchitem.tasks.all"
 # 	],
 # 	"daily": [
-# 		"showcase.tasks.daily"
+# 		"searchitem.tasks.daily"
 # 	],
 # 	"hourly": [
-# 		"showcase.tasks.hourly"
+# 		"searchitem.tasks.hourly"
 # 	],
 # 	"weekly": [
-# 		"showcase.tasks.weekly"
+# 		"searchitem.tasks.weekly"
 # 	]
 # 	"monthly": [
-# 		"showcase.tasks.monthly"
+# 		"searchitem.tasks.monthly"
 # 	]
 # }
 
 # Testing
 # -------
 
-# before_tests = "showcase.install.before_tests"
+# before_tests = "searchitem.install.before_tests"
 
 # Overriding Methods
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "showcase.event.get_events"
+# 	"frappe.desk.doctype.event.event.get_events": "searchitem.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;

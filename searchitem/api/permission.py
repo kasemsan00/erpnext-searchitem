@@ -3,7 +3,7 @@ from frappe import _
 
 def has_app_permission():
     """
-    Check if user has permission to access the showcase app
+    Check if user has permission to access the searchitem app
     """
     try:
         # Allow access to all authenticated users
@@ -21,7 +21,7 @@ def has_app_permission():
 
 def get_user_permissions():
     """
-    Get user permissions for showcase functionality
+    Get user permissions for searchitem functionality
     """
     try:
         user = frappe.get_doc("User", frappe.session.user)
@@ -41,7 +41,7 @@ def get_user_permissions():
         return permissions
         
     except Exception as e:
-        frappe.log_error(f"Showcase Permission Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Permission Error: {str(e)}", "Searchitem API")
         return {}
 
 def validate_item_access(item_code):
@@ -60,5 +60,5 @@ def validate_item_access(item_code):
         return True
         
     except Exception as e:
-        frappe.log_error(f"Showcase Item Access Error: {str(e)}", "Showcase API")
+        frappe.log_error(f"Searchitem Item Access Error: {str(e)}", "Searchitem API")
         return False

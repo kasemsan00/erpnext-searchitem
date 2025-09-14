@@ -26,7 +26,7 @@ block page_content %}
 										<button
 											class="btn btn-success search-btn"
 											type="button"
-											onclick="showcase.scanBarcode()"
+											onclick="searchitem.scanBarcode()"
 											title="ค้นหา"
 										>
 											ค้นหา
@@ -34,7 +34,7 @@ block page_content %}
 										<button
 											class="btn btn-outline-secondary clear-btn"
 											type="button"
-											onclick="showcase.clearSearch()"
+											onclick="searchitem.clearSearch()"
 											title="ล้างข้อมูล"
 										>
 											ล้าง
@@ -111,7 +111,7 @@ block page_content %}
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">
 						ปิด
 					</button>
-					<button type="button" class="btn btn-primary" onclick="showcase.downloadImage()">
+					<button type="button" class="btn btn-primary" onclick="searchitem.downloadImage()">
 						ดาวน์โหลด
 					</button>
 				</div>
@@ -138,7 +138,7 @@ block page_content %}
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">
 						ปิด
 					</button>
-					<button type="button" class="btn btn-info" onclick="showcase.printProductInfo()">
+					<button type="button" class="btn btn-info" onclick="searchitem.printProductInfo()">
 						พิมพ์ข้อมูล
 					</button>
 					<button type="button" class="btn btn-primary" id="viewFullDetails">
@@ -849,11 +849,11 @@ block page_content %}
 <script>
 	// Stock Management UI Enhancements
 	$(document).ready(function () {
-		// Initialize showcase
-		if (typeof showcase !== "undefined") {
+		// Initialize searchitem
+		if (typeof searchitem !== "undefined") {
 			console.log("Stock Management System initialized successfully");
 		} else {
-			console.error("Showcase object not found. Please check if showcase.js is loaded.");
+			console.error("Searchitem object not found. Please check if searchitem.js is loaded.");
 		}
 
 		// Update current time
@@ -883,13 +883,13 @@ block page_content %}
 			// F2 - Clear search
 			else if (e.which === 113) {
 				e.preventDefault();
-				showcase.clearSearch();
+				searchitem.clearSearch();
 			}
 			// ESC - Close modals and clear search
 			else if (e.which === 27) {
 				$('.modal').modal('hide');
 				if ($('#product-search').val()) {
-					showcase.clearSearch();
+					searchitem.clearSearch();
 				}
 			}
 		});
@@ -911,10 +911,10 @@ block page_content %}
 		});
 	});
 
-	// Extend showcase object with new functionality
-	if (typeof showcase !== "undefined") {
+	// Extend searchitem object with new functionality
+	if (typeof searchitem !== "undefined") {
 		// Clear search function
-		showcase.clearSearch = function() {
+		searchitem.clearSearch = function() {
 			$('#product-search').val('').focus();
 			this.searchKeyword = '';
 			this.hideSuggestions();
@@ -924,13 +924,13 @@ block page_content %}
 		};
 
 		// Show image in modal
-		showcase.showImageModal = function(imageSrc, productName, productCode) {
+		searchitem.showImageModal = function(imageSrc, productName, productCode) {
 			$('#modalImage').attr('src', imageSrc);
 			$('#imageModal').modal('show');
 		};
 
 		// Download image function
-		showcase.downloadImage = function() {
+		searchitem.downloadImage = function() {
 			const imageSrc = $('#modalImage').attr('src');
 			const productName = $('#imageProductName').text();
 			
@@ -946,7 +946,7 @@ block page_content %}
 		};
 
 		// Print product info function
-		showcase.printProductInfo = function() {
+		searchitem.printProductInfo = function() {
 			if (this.currentProductId) {
 				window.print();
 			}
