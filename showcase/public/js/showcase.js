@@ -6,6 +6,9 @@ frappe.provide("showcase");
 console.log("Showcase JS loaded. Frappe available:", typeof frappe !== "undefined");
 
 showcase = {
+
+	searchKeyword: "",
+
 	// Initialize the showcase app
 	init: function () {
 		this.bindEvents();
@@ -18,7 +21,8 @@ showcase = {
 	bindEvents: function () {
 		// Search input events
 		$(document).on("input", "#product-search", function () {
-			showcase.handleSearchInput($(this).val());
+			searchKeyword = $(this).val();
+			// showcase.handleSearchInput($(this).val());
 		});
 
 		// Enter key for item code search
@@ -65,11 +69,21 @@ showcase = {
 	addDiagnosticButton: function () {
 		// Add a small diagnostic button (only visible in development)
 		if (frappe.user.has_role("System Manager")) {
-			const diagnosticBtn = $(
-				'<button class="btn btn-sm btn-warning ml-2" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">🔍 Debug</button>'
+			const diagnosticContainer = $('<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>');
+			
+			const searchDiagnosticBtn = $(
+				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
 			);
-			diagnosticBtn.click(() => this.runDiagnostic());
-			$(".showcase-container").append(diagnosticBtn);
+			searchDiagnosticBtn.click(() => this.runDiagnostic());
+			
+			const imageDiagnosticBtn = $(
+				'<button class="btn btn-sm btn-info">🖼️ Image Debug</button>'
+			);
+			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
+			
+			diagnosticContainer.append(searchDiagnosticBtn);
+			diagnosticContainer.append(imageDiagnosticBtn);
+			$(".showcase-container").append(diagnosticContainer);
 		}
 	},
 
@@ -82,25 +96,41 @@ showcase = {
 			args: { query: query },
 			callback: function (r) {
 				if (r.message) {
-					console.log("Diagnostic Results:", r.message);
-					showcase.showDiagnosticResults(r.message);
+					console.log("Search Diagnostic Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Search Diagnostic Results");
+				}
+			},
+		});
+	},
+
+	// Run image diagnostic test
+	runImageDiagnostic: function () {
+		const itemCode = $("#product-search").val() || null;
+
+		frappe.call({
+			method: "showcase.api.products.diagnose_image_issue",
+			args: { item_code: itemCode },
+			callback: function (r) {
+				if (r.message) {
+					console.log("Image Diagnostic Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Image Diagnostic Results");
 				}
 			},
 		});
 	},
 
 	// Show diagnostic results
-	showDiagnosticResults: function (results) {
+	showDiagnosticResults: function (results, title = "Diagnostic Results") {
 		const modal = $(`
 			<div class="modal fade" id="diagnosticModal" tabindex="-1">
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title">Search Diagnostic Results</h5>
+							<h5 class="modal-title">${title}</h5>
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 						</div>
 						<div class="modal-body">
-							<pre>${JSON.stringify(results, null, 2)}</pre>
+							<pre style="max-height: 400px; overflow-y: auto;">${JSON.stringify(results, null, 2)}</pre>
 						</div>
 					</div>
 				</div>
@@ -121,23 +151,9 @@ showcase = {
 
 	// Handle search input with debouncing
 	handleSearchInput: function (query) {
-		clearTimeout(this.searchTimeout);
 
-		if (query === this.lastSearchQuery) return;
-		this.lastSearchQuery = query;
-
-		if (query.length < 2) {
-			this.hideSuggestions();
-			this.loadProducts();
-			return;
-		}
-
-		// Show loading state for suggestions
-		this.showSearchLoading();
-
-		this.searchTimeout = setTimeout(() => {
-			this.performSearch(query);
-		}, 300); // 300ms debounce for performance
+		console.log("handleSearchInput: ", query);
+		showcase.searchByItemCode(query);
 	},
 
 	// Handle Enter key press
@@ -409,9 +425,14 @@ showcase = {
 
 	// Scan barcode functionality
 	scanBarcode: function () {
+
+		console.log("scanBarcode: ", searchKeyword);
+
 		// Implementation for barcode scanning
 		// This would integrate with a barcode scanner library
-		frappe.show_alert(__("Barcode scanning functionality coming soon!"), 3);
+		// frappe.show_alert(__("Barcode scanning functionality coming soon!"), 3);
+		// showcase.searchKeyword = searchKeyword;
+		showcase.handleSearchInput(searchKeyword);
 	},
 };
 
