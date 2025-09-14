@@ -792,7 +792,7 @@ def get_safe_image_url(image_field):
         # This handles cases where the image field contains just the filename
         if '/' not in image_field:
             # If it's just a filename, assume it's in /files/
-            url = frappe.utils.get_url() + '/files/' + image_field
+            url = frappe.utils.get_url() + image_field
         else:
             # If it contains path separators, use as-is with base URL
             url = frappe.utils.get_url() + ('/' + image_field if not image_field.startswith('/') else image_field)
