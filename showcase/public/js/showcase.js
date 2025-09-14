@@ -19,10 +19,11 @@ showcase = {
 
 	// Bind event listeners
 	bindEvents: function () {
-		// Search input events
+		// Search input events - only update search keyword, no automatic search
 		$(document).on("input", "#product-search", function () {
 			showcase.searchKeyword = $(this).val();
-			showcase.handleSearchInput($(this).val());
+			// Hide suggestions when typing (no automatic search)
+			showcase.hideSuggestions();
 		});
 
 		// Enter key for item code search
@@ -165,31 +166,16 @@ showcase = {
 		});
 	},
 
-	// Setup search with debouncing for performance
+	// Setup search (simplified - no debouncing needed)
 	setupSearch: function () {
-		this.searchTimeout = null;
-		this.lastSearchQuery = "";
+		// No longer needed for automatic search
 	},
 
-	// Handle search input with debouncing
+	// Handle search input (simplified - no automatic search)
 	handleSearchInput: function (query) {
-		clearTimeout(this.searchTimeout);
-
-		if (query === this.lastSearchQuery) return;
-		this.lastSearchQuery = query;
-
-		if (query.length < 2) {
-			this.hideSuggestions();
-			this.loadProducts();
-			return;
-		}
-
-		// Show loading state for suggestions
-		this.showSearchLoading();
-
-		this.searchTimeout = setTimeout(() => {
-			this.performUnifiedSearch(query);
-		}, 300); // 300ms debounce for performance
+		// This function is no longer used for automatic search
+		// Search only happens on Enter key or button click
+		console.log("Search input changed to:", query);
 	},
 
 	// Handle Enter key press
