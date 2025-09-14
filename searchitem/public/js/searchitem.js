@@ -56,9 +56,13 @@ searchitem = {
 			}
 		});
 
-		// Handle image errors
+		// Handle image errors - show HTML text instead of default image
 		$(document).on("error", "img", function () {
-			this.src = "/assets/searchitem/images/default-product.png";
+			const $img = $(this);
+			const $container = $img.closest(".product-image-container, .suggestion-item");
+
+			// Replace image with HTML text
+			$img.replaceWith('<div class="no-image-placeholder">ไม่มีรูปภาพ</div>');
 		});
 
 		// Add diagnostic button (for debugging)
@@ -301,14 +305,21 @@ searchitem = {
 					? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
 					: "";
 
+			const safeImageUrl = this.getSafeImageUrl(product.image);
+			const imageHtml = safeImageUrl
+				? `<img src="${safeImageUrl}" 
+					   alt="${product.item_name}" 
+					   class="mr-3"
+					   style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">`
+				: `<div class="no-image-placeholder mr-3" 
+					   style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: 4px; font-size: 10px; color: #6c757d; text-align: center;">
+					   ไม่มีรูปภาพ
+				   </div>`;
+
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
-                        <img src="${this.getSafeImageUrl(product.image)}" 
-                             alt="${product.item_name}" 
-                             class="mr-3"
-                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
-                             onerror="this.src='/assets/searchitem/images/default-product.png'">
+                        ${imageHtml}
                         <div class="flex-grow-1">
                             <div class="font-weight-bold">${
 								product.item_name
@@ -327,8 +338,8 @@ searchitem = {
 
 	// Get safe image URL
 	getSafeImageUrl: function (imageUrl) {
-		if (!imageUrl) {
-			return "/assets/searchitem/images/default-product.png";
+		if (!imageUrl || imageUrl.trim() === "") {
+			return null;
 		}
 
 		// If it's already a full URL, return as is
@@ -341,8 +352,8 @@ searchitem = {
 			return imageUrl;
 		}
 
-		// Default fallback
-		return "/assets/searchitem/images/default-product.png";
+		// Return the image URL as is if it's not empty
+		return imageUrl;
 	},
 
 	// Hide search suggestions
@@ -431,20 +442,25 @@ searchitem = {
 		const stockStatus = this.getStockStatus(product.stock_qty);
 		const stockBadge = this.getStockBadge(product.stock_qty);
 
+		const safeImageUrl = this.getSafeImageUrl(product.image);
+		const imageHtml = safeImageUrl
+			? `<img src="${safeImageUrl}" 
+				   alt="${product.item_name}" 
+				   class="product-detail-image"
+				   onclick="searchitem.showImageModal('${safeImageUrl}', '${product.item_name}', '${product.item_code}')">`
+			: `<div class="no-image-placeholder product-detail-image" 
+				   style="display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; color: #6c757d; font-size: 16px; text-align: center; cursor: default;">
+				   ไม่มีรูปภาพ
+			   </div>`;
+
 		const content = `
 			<div class="product-header">
 				<h2>รายละเอียดสินค้า</h2>
 			</div>
 			<div class="product-body">
 				<div class="product-image-container">
-					<img src="${imageUrl}" 
-						 alt="${product.item_name}" 
-						 class="product-detail-image"
-						 onclick="searchitem.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
-						 onerror="this.src='${defaultImage}'">
-					<div class="image-overlay">
-						คลิกเพื่อขยาย
-					</div>
+					${imageHtml}
+					${safeImageUrl ? '<div class="image-overlay">คลิกเพื่อขยาย</div>' : ""}
 				</div>
 				
 				<div class="product-info-simple">
@@ -496,11 +512,13 @@ searchitem = {
 					<button class="btn btn-success action-btn" onclick="searchitem.printProductInfo()">
 						พิมพ์ข้อมูล
 					</button>
-					<button class="btn btn-warning action-btn" onclick="searchitem.showImageModal('${imageUrl}', '${
-			product.item_name
-		}', '${product.item_code}')">
-						ดูรูปภาพ
-					</button>
+					${
+						safeImageUrl
+							? `<button class="btn btn-warning action-btn" onclick="searchitem.showImageModal('${safeImageUrl}', '${product.item_name}', '${product.item_code}')">
+							ดูรูปภาพ
+						</button>`
+							: ""
+					}
 				</div>
 			</div>
         `;
