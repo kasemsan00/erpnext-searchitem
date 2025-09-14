@@ -434,9 +434,6 @@ searchitem = {
 		const content = `
 			<div class="product-header">
 				<h2>รายละเอียดสินค้า</h2>
-				<div class="product-actions-header">
-					${stockBadge}
-				</div>
 			</div>
 			<div class="product-body">
 				<div class="product-image-container">
