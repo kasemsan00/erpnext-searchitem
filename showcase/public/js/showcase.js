@@ -364,7 +364,7 @@ showcase = {
 	showSearchLoading: function () {
 		const suggestionsContainer = $("#search-suggestions");
 		suggestionsContainer.html(
-			'<div class="p-3 text-center text-muted"><i class="fa fa-spinner fa-spin"></i> Searching...</div>'
+			'<div class="p-3 text-center text-muted">Searching...</div>'
 		);
 		suggestionsContainer.show();
 	},
@@ -445,7 +445,7 @@ showcase = {
 
 		const content = `
 			<div class="product-header">
-				<h2><i class="fa fa-box"></i> รายละเอียดสินค้า</h2>
+				<h2>รายละเอียดสินค้า</h2>
 				<div class="product-actions-header">
 					${stockBadge}
 				</div>
@@ -458,14 +458,14 @@ showcase = {
 						 onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
 						 onerror="this.src='${defaultImage}'">
 					<div class="image-overlay">
-						<i class="fa fa-search-plus"></i> คลิกเพื่อขยาย
+						คลิกเพื่อขยาย
 					</div>
 				</div>
 				
 				<div class="product-info-grid">
 					<div class="product-main-info">
-						<h3 class="product-detail-title">${product.item_name}</h3>
-						<div class="product-detail-code">${product.item_code || "ไม่มีรหัส"}</div>
+						<h4 class="product-detail-title">${product.item_name}</h4>
+						<div class="product-detail-code">รหัสสินค้า: ${product.item_code || "ไม่มีรหัส"}</div>
 						<div class="product-detail-price">${price}</div>
 						${product.description ? `<div class="product-detail-description">${product.description}</div>` : ''}
 					</div>
@@ -496,13 +496,13 @@ showcase = {
 				
 				<div class="product-actions">
 					<button class="btn btn-info action-btn" onclick="showcase.viewFullDetails('${product.name}')">
-						<i class="fa fa-external-link-alt"></i> ดูข้อมูลใน ERPNext
+						ดูข้อมูลใน ERPNext
 					</button>
 					<button class="btn btn-success action-btn" onclick="showcase.printProductInfo()">
-						<i class="fa fa-print"></i> พิมพ์ข้อมูล
+						พิมพ์ข้อมูล
 					</button>
 					<button class="btn btn-warning action-btn" onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')">
-						<i class="fa fa-image"></i> ดูรูปภาพ
+						ดูรูปภาพ
 					</button>
 				</div>
 			</div>
@@ -530,7 +530,7 @@ showcase = {
 						   status.status === "low_stock" ? "badge-warning" : "badge-success";
 		
 		return `<span class="badge ${badgeClass} badge-lg">
-					<i class="fa fa-warehouse"></i> Stock: ${status.text}
+					Stock: ${status.text}
 				</span>`;
 	},
 

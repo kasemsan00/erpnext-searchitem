@@ -13,11 +13,12 @@
 		}
 
 		// Prevent background changes on hover and focus
-		.search-input {
+		.search-input,
+		.form-control.search-input {
 			&:hover,
 			&:focus,
 			&:active {
-				background-color: none !important;
+				background-color: transparent !important;
 				background-image: none !important;
 			}
 		}
