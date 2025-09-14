@@ -4,7 +4,7 @@ def get_context(context):
 	"""
 	Get context for showcase page
 	"""
-	context.title = "ERPNext Showcase"
+	context.title = "Search item"
 	context.show_sidebar = False
 	context.no_cache = True
 	

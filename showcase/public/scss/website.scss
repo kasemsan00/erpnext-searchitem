@@ -1,4 +1,4 @@
-// ERPNext Showcase Website Styles
+// Search item Website Styles
 
 .showcase-container {
 	.showcase-search {
@@ -9,6 +9,17 @@
 
 			.btn {
 				border-radius: 0 4px 4px 0;
+			}
+		}
+
+		// Prevent background changes on hover and focus
+		.search-input,
+		.form-control.search-input {
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: transparent !important;
+				background-image: none !important;
 			}
 		}
 	}

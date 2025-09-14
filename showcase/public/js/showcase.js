@@ -1,4 +1,4 @@
-// ERPNext Showcase App JavaScript
+// Search item App JavaScript
 
 frappe.provide("showcase");
 
@@ -6,6 +6,9 @@ frappe.provide("showcase");
 console.log("Showcase JS loaded. Frappe available:", typeof frappe !== "undefined");
 
 showcase = {
+
+	searchKeyword: "",
+
 	// Initialize the showcase app
 	init: function () {
 		this.bindEvents();
@@ -16,14 +19,16 @@ showcase = {
 
 	// Bind event listeners
 	bindEvents: function () {
-		// Search input events
+		// Search input events - only update search keyword, no automatic search
 		$(document).on("input", "#product-search", function () {
-			showcase.handleSearchInput($(this).val());
+			showcase.searchKeyword = $(this).val();
+			// Hide suggestions when typing (no automatic search)
+			showcase.hideSuggestions();
 		});
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log("Key pressed xx:", e.key);
+			console.log("Key pressed :", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
@@ -65,11 +70,27 @@ showcase = {
 	addDiagnosticButton: function () {
 		// Add a small diagnostic button (only visible in development)
 		if (frappe.user.has_role("System Manager")) {
-			const diagnosticBtn = $(
-				'<button class="btn btn-sm btn-warning ml-2" style="position: absolute; top: 10px; right: 10px; z-index: 1000;">🔍 Debug</button>'
+			const diagnosticContainer = $('<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>');
+			
+			const searchDiagnosticBtn = $(
+				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
 			);
-			diagnosticBtn.click(() => this.runDiagnostic());
-			$(".showcase-container").append(diagnosticBtn);
+			searchDiagnosticBtn.click(() => this.runDiagnostic());
+			
+			const imageDiagnosticBtn = $(
+				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
+			);
+			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
+			
+			const unifiedSearchTestBtn = $(
+				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
+			);
+			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
+			
+			diagnosticContainer.append(searchDiagnosticBtn);
+			diagnosticContainer.append(imageDiagnosticBtn);
+			diagnosticContainer.append(unifiedSearchTestBtn);
+			$(".showcase-container").append(diagnosticContainer);
 		}
 	},
 
@@ -82,25 +103,57 @@ showcase = {
 			args: { query: query },
 			callback: function (r) {
 				if (r.message) {
-					console.log("Diagnostic Results:", r.message);
-					showcase.showDiagnosticResults(r.message);
+					console.log("Search Diagnostic Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Search Diagnostic Results");
+				}
+			},
+		});
+	},
+
+	// Run image diagnostic test
+	runImageDiagnostic: function () {
+		const itemCode = $("#product-search").val() || null;
+
+		frappe.call({
+			method: "showcase.api.products.diagnose_image_issue",
+			args: { item_code: itemCode },
+			callback: function (r) {
+				if (r.message) {
+					console.log("Image Diagnostic Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Image Diagnostic Results");
+				}
+			},
+		});
+	},
+
+	// Test unified search functionality
+	testUnifiedSearch: function () {
+		const query = $("#product-search").val() || "test";
+
+		frappe.call({
+			method: "showcase.api.products.test_unified_search",
+			args: { query: query },
+			callback: function (r) {
+				if (r.message) {
+					console.log("Unified Search Test Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Unified Search Test Results");
 				}
 			},
 		});
 	},
 
 	// Show diagnostic results
-	showDiagnosticResults: function (results) {
+	showDiagnosticResults: function (results, title = "Diagnostic Results") {
 		const modal = $(`
 			<div class="modal fade" id="diagnosticModal" tabindex="-1">
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title">Search Diagnostic Results</h5>
+							<h5 class="modal-title">${title}</h5>
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 						</div>
 						<div class="modal-body">
-							<pre>${JSON.stringify(results, null, 2)}</pre>
+							<pre style="max-height: 400px; overflow-y: auto;">${JSON.stringify(results, null, 2)}</pre>
 						</div>
 					</div>
 				</div>
@@ -113,51 +166,29 @@ showcase = {
 		});
 	},
 
-	// Setup search with debouncing for performance
+	// Setup search (simplified - no debouncing needed)
 	setupSearch: function () {
-		this.searchTimeout = null;
-		this.lastSearchQuery = "";
+		// No longer needed for automatic search
 	},
 
-	// Handle search input with debouncing
+	// Handle search input (simplified - no automatic search)
 	handleSearchInput: function (query) {
-		clearTimeout(this.searchTimeout);
-
-		if (query === this.lastSearchQuery) return;
-		this.lastSearchQuery = query;
-
-		if (query.length < 2) {
-			this.hideSuggestions();
-			this.loadProducts();
-			return;
-		}
-
-		// Show loading state for suggestions
-		this.showSearchLoading();
-
-		this.searchTimeout = setTimeout(() => {
-			this.performSearch(query);
-		}, 300); // 300ms debounce for performance
+		// This function is no longer used for automatic search
+		// Search only happens on Enter key or button click
+		console.log("Search input changed to:", query);
 	},
 
 	// Handle Enter key press
 	handleEnterKey: function (query) {
 		if (!query.trim()) return;
 
-		// Check if it looks like an item code (alphanumeric, typically 6-20 chars)
-		const itemCodePattern = /^[A-Za-z0-9-_]{3,20}$/;
-
-		if (itemCodePattern.test(query.trim())) {
-			// Search for specific item code
-			this.searchByItemCode(query.trim());
-		} else {
-			// Perform regular search
-			this.performSearch(query);
-		}
+		// Use unified search for Enter key as well
+		this.performUnifiedSearchDirect(query.trim());
 	},
 
 	// Search by specific item code
 	searchByItemCode: function (itemCode) {
+		console.log("searchByItemCode: ", itemCode);
 		this.showLoading();
 		this.hideSuggestions();
 
@@ -183,7 +214,57 @@ showcase = {
 		});
 	},
 
-	// Perform search with suggestions
+	// Perform unified search with suggestions (for typing)
+	performUnifiedSearch: function (query) {
+		frappe.call({
+			method: "showcase.api.products.search_product_unified",
+			args: {
+				query: query,
+			},
+			callback: function (r) {
+				if (r.message && r.message.length > 0) {
+					console.log("Unified search results:", r.message);
+					showcase.showSearchSuggestions(r.message);
+				} else {
+					showcase.hideSuggestions();
+				}
+			},
+			error: function () {
+				showcase.hideSearchLoading();
+			},
+		});
+	},
+
+	// Perform unified search direct (for Enter key)
+	performUnifiedSearchDirect: function (query) {
+		console.log("performUnifiedSearchDirect: ", query);
+		this.showLoading();
+		this.hideSuggestions();
+
+		frappe.call({
+			method: "showcase.api.products.search_product_unified",
+			args: {
+				query: query,
+			},
+			callback: function (r) {
+				showcase.hideLoading();
+				if (r.message && r.message.length > 0) {
+					console.log("Direct unified search results:", r.message);
+					// Show the first product details directly
+					showcase.showProductDetails(r.message[0].name);
+				} else {
+					showcase.showNoProducts();
+					frappe.show_alert(__("No product found for: {0}", [query]), 3);
+				}
+			},
+			error: function () {
+				showcase.hideLoading();
+				showcase.showNoProducts();
+			},
+		});
+	},
+
+	// Perform search with suggestions (legacy method - kept for compatibility)
 	performSearch: function (query) {
 		frappe.call({
 			method: "showcase.api.products.search_products",
@@ -213,6 +294,11 @@ showcase = {
 		}
 
 		products.forEach((product) => {
+			// Add search method indicator for debugging (only for System Managers)
+			const searchMethodBadge = product.search_method && frappe.user.has_role("System Manager") 
+				? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>` 
+				: '';
+			
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
@@ -221,8 +307,8 @@ showcase = {
                              class="mr-3"
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
                              onerror="this.src='/assets/showcase/images/default-product.png'">
-                        <div>
-                            <div class="font-weight-bold">${product.item_name}</div>
+                        <div class="flex-grow-1">
+                            <div class="font-weight-bold">${product.item_name}${searchMethodBadge}</div>
                             <div class="text-muted small">${product.item_code || ""}</div>
                         </div>
                     </div>
@@ -264,7 +350,7 @@ showcase = {
 	showSearchLoading: function () {
 		const suggestionsContainer = $("#search-suggestions");
 		suggestionsContainer.html(
-			'<div class="p-3 text-center text-muted"><i class="fa fa-spinner fa-spin"></i> Searching...</div>'
+			'<div class="p-3 text-center text-muted">Searching...</div>'
 		);
 		suggestionsContainer.show();
 	},
@@ -317,6 +403,7 @@ showcase = {
 				product_id: productId,
 			},
 			callback: function (r) {
+				console.log("showProductDetails: ", r);
 				showcase.hideLoading();
 				if (r.message) {
 					showcase.renderProductDetail(r.message);
@@ -330,85 +417,200 @@ showcase = {
 		});
 	},
 
-	// Render product detail on page
+	// Render product detail on page with enhanced stock management UI
 	renderProductDetail: function (product) {
-		const detailContainer = $("#product-detail");
+		console.log("renderProductDetail: ", product);
+		const detailContainer = $("#product-detail .product-card");
 		const price = this.formatPrice(product.standard_rate);
+		const imageUrl = this.getSafeImageUrl(product.image);
+		const defaultImage = "/assets/showcase/images/default-product.png";
+
+		// Stock status indicator
+		const stockStatus = this.getStockStatus(product.stock_qty);
+		const stockBadge = this.getStockBadge(product.stock_qty);
 
 		const content = `
-            <div class="row">
-                <div class="col-md-5">
-                    <img src="${this.getSafeImageUrl(product.image)}" 
-                         alt="${product.item_name}" 
-                         class="product-detail-image"
-                         onerror="this.src='/assets/showcase/images/default-product.png'">
-                </div>
-                <div class="col-md-7">
-                    <div class="product-detail-title">${product.item_name}</div>
-                    <div class="product-detail-code">${product.item_code || ""}</div>
-                    <div class="product-detail-price">${price}</div>
-                    ${
-						product.description
-							? `<div class="product-detail-description">${product.description}</div>`
-							: ""
-					}
-                    
-                    <div class="product-detail-info">
-                        ${
-							product.item_group
-								? `<div class="info-item">
-                                    <span class="info-label">หมวดหมู่:</span>
-                                    <span class="info-value">${product.item_group}</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.brand
-								? `<div class="info-item">
-                                    <span class="info-label">แบรนด์:</span>
-                                    <span class="info-value">${product.brand}</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.weight_per_unit
-								? `<div class="info-item">
-                                    <span class="info-label">น้ำหนัก:</span>
-                                    <span class="info-value">${product.weight_per_unit} ${
-										product.weight_uom || "kg"
-								  }</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.stock_qty !== undefined
-								? `<div class="info-item">
-                                    <span class="info-label">คงเหลือ:</span>
-                                    <span class="info-value">${product.stock_qty || 0} ${
-										product.stock_uom || "หน่วย"
-								  }</span>
-                                </div>`
-								: ""
-						}
-                    </div>
-                </div>
-            </div>
+			<div class="product-header">
+				<h2>รายละเอียดสินค้า</h2>
+				<div class="product-actions-header">
+					${stockBadge}
+				</div>
+			</div>
+			<div class="product-body">
+				<div class="product-image-container">
+					<img src="${imageUrl}" 
+						 alt="${product.item_name}" 
+						 class="product-detail-image"
+						 onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
+						 onerror="this.src='${defaultImage}'">
+					<div class="image-overlay">
+						คลิกเพื่อขยาย
+					</div>
+				</div>
+				
+				<div class="product-info-simple">
+					<div class="product-details-simple">
+						<div class="detail-row">
+							<span class="detail-label">ชื่อสินค้า:</span>
+							<span class="detail-value">${product.item_name }</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">รหัสบาร์โค้ด:</span>
+							<span class="detail-value">${product.barcode || "ไม่มีรหัส"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">รหัสสินค้า:</span>
+							<span class="detail-value">${product.item_code || "ไม่มีรหัส"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">คงเหลือ:</span>
+							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">หมวดหมู่:</span>
+							<span class="detail-value">${product.item_group || "ไม่ระบุ"}</span>
+						</div>
+						${product.brand ? `
+						<div class="detail-row">
+							<span class="detail-label">แบรนด์:</span>
+							<span class="detail-value">${product.brand}</span>
+						</div>` : ''}
+						${product.weight_per_unit ? `
+						<div class="detail-row">
+							<span class="detail-label">น้ำหนัก:</span>
+							<span class="detail-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</span>
+						</div>` : ''}
+					</div>
+				</div>
+				
+				<div class="product-actions">
+					<button class="btn btn-success action-btn" onclick="showcase.printProductInfo()">
+						พิมพ์ข้อมูล
+					</button>
+					<button class="btn btn-warning action-btn" onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')">
+						ดูรูปภาพ
+					</button>
+				</div>
+			</div>
         `;
 
 		detailContainer.html(content);
 	},
 
+	// Get stock status for styling
+	getStockStatus: function(stockQty) {
+		const qty = parseFloat(stockQty) || 0;
+		if (qty <= 0) {
+			return { status: "out_of_stock", class: "text-danger", text: "หมด" };
+		} else if (qty <= 10) {
+			return { status: "low_stock", class: "text-warning", text: "ต่ำ" };
+		} else {
+			return { status: "in_stock", class: "text-success", text: "ปกติ" };
+		}
+	},
+
+	// Get stock badge
+	getStockBadge: function(stockQty) {
+		const status = this.getStockStatus(stockQty);
+		const badgeClass = status.status === "out_of_stock" ? "badge-danger" : 
+						   status.status === "low_stock" ? "badge-warning" : "badge-success";
+		
+		return `<span class="badge ${badgeClass} badge-lg">
+					Stock: ${status.text}
+				</span>`;
+	},
+
 	// View full details in ERPNext form
 	viewFullDetails: function (productId) {
 		$("#productDetailModal").modal("hide");
+		$("#imageModal").modal("hide");
 		frappe.set_route("Form", "Item", productId);
+	},
+
+	// Show image in modal (defined here for consistency)
+	showImageModal: function(imageSrc, productName, productCode) {
+		if (!imageSrc || imageSrc.includes('default-product.png')) {
+			frappe.show_alert(__("ไม่มีรูปภาพสำหรับสินค้านี้"), 3);
+			return;
+		}
+		
+		$('#modalImage').attr('src', imageSrc);
+		$('#imageProductName').text(productName);
+		$('#imageProductCode').text(productCode);
+		$('#imageModal').modal('show');
+	},
+
+	// Download image function (defined here for consistency)
+	downloadImage: function() {
+		const imageSrc = $('#modalImage').attr('src');
+		const productName = $('#imageProductName').text();
+		
+		if (imageSrc && !imageSrc.includes('default-product.png')) {
+			const link = document.createElement('a');
+			link.href = imageSrc;
+			link.download = `${productName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_image.jpg`;
+			link.target = '_blank';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			
+			frappe.show_alert(__("กำลังดาวน์โหลดรูปภาพ..."), 2);
+		} else {
+			frappe.show_alert(__("ไม่สามารถดาวน์โหลดรูปภาพได้"), 3);
+		}
+	},
+
+	// Print product info function (defined here for consistency)
+	printProductInfo: function() {
+		if (this.currentProductId) {
+			// Add print-specific styles
+			const printStyles = `
+				<style>
+					@media print {
+						body * { visibility: hidden; }
+						#product-detail, #product-detail * { visibility: visible; }
+						#product-detail { position: absolute; left: 0; top: 0; width: 100%; }
+						.product-actions, .search-section, .stock-header { display: none !important; }
+					}
+				</style>
+			`;
+			
+			if (!document.getElementById('print-styles')) {
+				const style = document.createElement('style');
+				style.id = 'print-styles';
+				style.innerHTML = printStyles.replace('<style>', '').replace('</style>', '');
+				document.head.appendChild(style);
+			}
+			
+			setTimeout(() => {
+				window.print();
+			}, 100);
+		} else {
+			frappe.show_alert(__("ไม่มีข้อมูลสินค้าให้พิมพ์"), 3);
+		}
+	},
+
+	// Clear search function (defined here for consistency)
+	clearSearch: function() {
+		$('#product-search').val('').focus();
+		this.searchKeyword = '';
+		this.hideSuggestions();
+		$('#product-detail').hide();
+		$('#no-products').hide();
+		$('#loading-state').hide();
 	},
 
 	// Scan barcode functionality
 	scanBarcode: function () {
-		// Implementation for barcode scanning
-		// This would integrate with a barcode scanner library
-		frappe.show_alert(__("Barcode scanning functionality coming soon!"), 3);
+		console.log("scanBarcode: ", this.searchKeyword);
+
+		if (!this.searchKeyword || !this.searchKeyword.trim()) {
+			frappe.show_alert(__("Please enter a barcode or item code to search"), 3);
+			return;
+		}
+
+		// Use direct unified search for barcode scanning
+		this.performUnifiedSearchDirect(this.searchKeyword.trim());
 	},
 };
 

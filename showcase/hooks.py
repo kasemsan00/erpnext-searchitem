@@ -1,5 +1,5 @@
 app_name = "showcase"
-app_title = "ERPNext Showcase"
+app_title = "Search item"
 app_publisher = "kasemsan"
 app_description = "Show product by scan barcode or search by name"
 app_email = "kasemsan.cho@gmail.com"
@@ -16,7 +16,7 @@ add_to_apps_screen = [
 	{
 		"name": "showcase",
 		"logo": "/assets/showcase/logo.png",
-		"title": "ERPNext Showcase",
+		"title": "Search item",
 		"route": "/showcase",
 		"has_permission": "showcase.api.permission.has_app_permission"
 	}
@@ -32,6 +32,20 @@ app_include_js = "/assets/showcase/js/showcase.js"
 # include js, css files in header of web template
 web_include_css = "/assets/showcase/css/showcase.css"
 web_include_js = "/assets/showcase/js/showcase.js"
+
+# For development: disable JS caching by adding version parameter
+import frappe
+import time
+
+def get_js_with_version():
+    if frappe.conf.get("developer_mode"):
+        return f"/assets/showcase/js/showcase.js?v={int(time.time())}"
+    return "/assets/showcase/js/showcase.js"
+
+# Override JS includes in development mode
+if frappe.conf.get("developer_mode"):
+    app_include_js = get_js_with_version()
+    web_include_js = get_js_with_version()
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "showcase/public/scss/website"
