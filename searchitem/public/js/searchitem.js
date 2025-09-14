@@ -349,7 +349,18 @@ searchitem = {
 
 		// If it's a relative path, make it absolute
 		if (imageUrl.startsWith("/")) {
+			// Ensure it starts with the correct base path
 			return imageUrl;
+		}
+
+		// If it's a file path without leading slash, add it
+		if (imageUrl.includes("/") && !imageUrl.startsWith("/")) {
+			return "/" + imageUrl;
+		}
+
+		// For file names without path, assume they're in /files/
+		if (!imageUrl.includes("/")) {
+			return "/files/" + imageUrl;
 		}
 
 		// Return the image URL as is if it's not empty
@@ -567,9 +578,25 @@ searchitem = {
 			return;
 		}
 
-		$("#modalImage").attr("src", imageSrc);
-		$("#imageProductName").text(productName);
-		$("#imageProductCode").text(productCode);
+		// Ensure the image URL is properly formatted
+		const safeImageUrl = this.getSafeImageUrl(imageSrc);
+		if (!safeImageUrl) {
+			frappe.show_alert(__("ไม่สามารถโหลดรูปภาพได้"), 3);
+			return;
+		}
+
+		// Set the image source
+		$("#modalImage").attr("src", safeImageUrl);
+		
+		// Set product information if elements exist
+		if ($("#imageProductName").length) {
+			$("#imageProductName").text(productName || "");
+		}
+		if ($("#imageProductCode").length) {
+			$("#imageProductCode").text(productCode || "");
+		}
+		
+		// Show the modal
 		$("#imageModal").modal("show");
 	},
 
