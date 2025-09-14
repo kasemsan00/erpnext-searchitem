@@ -295,6 +295,160 @@ def get_product_by_barcode(barcode):
         return None
 
 @frappe.whitelist()
+def search_product_unified(query):
+    """
+    Unified search that tries barcode first, then item code, then item name
+    Priority: Barcode -> Item Code -> Item Name
+    """
+    try:
+        if not query or not query.strip():
+            return []
+        
+        clean_query = query.strip()
+        frappe.logger().debug(f"Unified search for: '{clean_query}'")
+        
+        # Step 1: Try barcode search first
+        try:
+            # Search in Item Barcode doctype
+            barcode_docs = frappe.get_all(
+                "Item Barcode",
+                fields=["parent"],
+                filters={"barcode": clean_query},
+                limit=5
+            )
+            
+            if barcode_docs:
+                frappe.logger().debug(f"Found {len(barcode_docs)} items by barcode")
+                # Get items from barcode matches
+                item_codes = [doc.parent for doc in barcode_docs]
+                products = frappe.get_all(
+                    "Item",
+                    fields=[
+                        "name", "item_name", "item_code", "description", 
+                        "standard_rate", "image", "item_group", "stock_uom"
+                    ],
+                    filters=[
+                        ["disabled", "=", 0],
+                        ["is_stock_item", "=", 1],
+                        ["item_code", "in", item_codes]
+                    ],
+                    limit=5
+                )
+                
+                if products:
+                    # Process images and return results
+                    for product in products:
+                        original_image = product.image
+                        product.image = get_safe_image_url(product.image)
+                        product.search_method = "barcode"  # Add search method for debugging
+                        frappe.logger().debug(f"Found by barcode: {product.item_code}")
+                    
+                    frappe.logger().debug(f"Returning {len(products)} products found by barcode")
+                    return products
+                    
+        except Exception as e:
+            frappe.logger().debug(f"Barcode search error: {str(e)}")
+        
+        # Step 2: Try exact item code match
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=[
+                    "name", "item_name", "item_code", "description", 
+                    "standard_rate", "image", "item_group", "stock_uom"
+                ],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_code", "=", clean_query]
+                ],
+                limit=5
+            )
+            
+            if products:
+                frappe.logger().debug(f"Found {len(products)} items by exact item code")
+                for product in products:
+                    original_image = product.image
+                    product.image = get_safe_image_url(product.image)
+                    product.search_method = "item_code_exact"
+                    frappe.logger().debug(f"Found by item code: {product.item_code}")
+                
+                frappe.logger().debug(f"Returning {len(products)} products found by item code")
+                return products
+                
+        except Exception as e:
+            frappe.logger().debug(f"Item code search error: {str(e)}")
+        
+        # Step 3: Try partial item code match
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=[
+                    "name", "item_name", "item_code", "description", 
+                    "standard_rate", "image", "item_group", "stock_uom"
+                ],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_code", "like", f"%{clean_query}%"]
+                ],
+                limit=5
+            )
+            
+            if products:
+                frappe.logger().debug(f"Found {len(products)} items by partial item code")
+                for product in products:
+                    original_image = product.image
+                    product.image = get_safe_image_url(product.image)
+                    product.search_method = "item_code_partial"
+                    frappe.logger().debug(f"Found by partial item code: {product.item_code}")
+                
+                frappe.logger().debug(f"Returning {len(products)} products found by partial item code")
+                return products
+                
+        except Exception as e:
+            frappe.logger().debug(f"Partial item code search error: {str(e)}")
+        
+        # Step 4: Try item name search
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=[
+                    "name", "item_name", "item_code", "description", 
+                    "standard_rate", "image", "item_group", "stock_uom"
+                ],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_name", "like", f"%{clean_query}%"]
+                ],
+                limit=5
+            )
+            
+            if products:
+                frappe.logger().debug(f"Found {len(products)} items by item name")
+                for product in products:
+                    original_image = product.image
+                    product.image = get_safe_image_url(product.image)
+                    product.search_method = "item_name"
+                    frappe.logger().debug(f"Found by item name: {product.item_name}")
+                
+                frappe.logger().debug(f"Returning {len(products)} products found by item name")
+                return products
+                
+        except Exception as e:
+            frappe.logger().debug(f"Item name search error: {str(e)}")
+        
+        # No results found
+        frappe.logger().debug(f"No products found for query: '{clean_query}'")
+        return []
+        
+    except Exception as e:
+        frappe.log_error(f"Showcase Unified Search Error: {str(e)}", "Showcase API")
+        frappe.logger().debug(f"Unified search error: {str(e)}")
+        return []
+
+@frappe.whitelist()
 def diagnose_image_issue(item_code=None):
     """
     Diagnostic function to help identify image issues
@@ -371,6 +525,167 @@ def diagnose_image_issue(item_code=None):
         
     except Exception as e:
         frappe.log_error(f"Image Diagnosis Error: {str(e)}", "Showcase API")
+        return {"error": str(e)}
+
+@frappe.whitelist()
+def test_unified_search(query):
+    """
+    Test the unified search functionality with detailed logging
+    """
+    try:
+        if not query:
+            return {"error": "No query provided"}
+        
+        result = {
+            "query": query,
+            "search_steps": [],
+            "final_results": []
+        }
+        
+        # Test each step of the unified search
+        clean_query = query.strip()
+        
+        # Step 1: Test barcode search
+        try:
+            barcode_docs = frappe.get_all(
+                "Item Barcode",
+                fields=["parent", "barcode"],
+                filters={"barcode": clean_query},
+                limit=5
+            )
+            
+            step1_result = {
+                "step": "barcode_search",
+                "query": clean_query,
+                "found_barcodes": len(barcode_docs),
+                "barcode_docs": barcode_docs
+            }
+            
+            if barcode_docs:
+                item_codes = [doc.parent for doc in barcode_docs]
+                products = frappe.get_all(
+                    "Item",
+                    fields=["name", "item_name", "item_code", "image"],
+                    filters=[
+                        ["disabled", "=", 0],
+                        ["is_stock_item", "=", 1],
+                        ["item_code", "in", item_codes]
+                    ]
+                )
+                step1_result["found_products"] = len(products)
+                step1_result["products"] = products
+                if products:
+                    result["final_results"] = products
+                    result["search_steps"].append(step1_result)
+                    return result
+            
+            result["search_steps"].append(step1_result)
+            
+        except Exception as e:
+            result["search_steps"].append({
+                "step": "barcode_search",
+                "error": str(e)
+            })
+        
+        # Step 2: Test exact item code
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=["name", "item_name", "item_code", "image"],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_code", "=", clean_query]
+                ]
+            )
+            
+            step2_result = {
+                "step": "exact_item_code",
+                "query": clean_query,
+                "found_products": len(products),
+                "products": products
+            }
+            
+            if products:
+                result["final_results"] = products
+                result["search_steps"].append(step2_result)
+                return result
+            
+            result["search_steps"].append(step2_result)
+            
+        except Exception as e:
+            result["search_steps"].append({
+                "step": "exact_item_code",
+                "error": str(e)
+            })
+        
+        # Step 3: Test partial item code
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=["name", "item_name", "item_code", "image"],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_code", "like", f"%{clean_query}%"]
+                ],
+                limit=5
+            )
+            
+            step3_result = {
+                "step": "partial_item_code",
+                "query": clean_query,
+                "found_products": len(products),
+                "products": products
+            }
+            
+            if products:
+                result["final_results"] = products
+                result["search_steps"].append(step3_result)
+                return result
+            
+            result["search_steps"].append(step3_result)
+            
+        except Exception as e:
+            result["search_steps"].append({
+                "step": "partial_item_code",
+                "error": str(e)
+            })
+        
+        # Step 4: Test item name
+        try:
+            products = frappe.get_all(
+                "Item",
+                fields=["name", "item_name", "item_code", "image"],
+                filters=[
+                    ["disabled", "=", 0],
+                    ["is_stock_item", "=", 1],
+                    ["item_name", "like", f"%{clean_query}%"]
+                ],
+                limit=5
+            )
+            
+            step4_result = {
+                "step": "item_name",
+                "query": clean_query,
+                "found_products": len(products),
+                "products": products
+            }
+            
+            if products:
+                result["final_results"] = products
+            
+            result["search_steps"].append(step4_result)
+            
+        except Exception as e:
+            result["search_steps"].append({
+                "step": "item_name",
+                "error": str(e)
+            })
+        
+        return result
+        
+    except Exception as e:
         return {"error": str(e)}
 
 @frappe.whitelist()

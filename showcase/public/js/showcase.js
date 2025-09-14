@@ -21,8 +21,8 @@ showcase = {
 	bindEvents: function () {
 		// Search input events
 		$(document).on("input", "#product-search", function () {
-			searchKeyword = $(this).val();
-			// showcase.handleSearchInput($(this).val());
+			showcase.searchKeyword = $(this).val();
+			showcase.handleSearchInput($(this).val());
 		});
 
 		// Enter key for item code search
@@ -77,12 +77,18 @@ showcase = {
 			searchDiagnosticBtn.click(() => this.runDiagnostic());
 			
 			const imageDiagnosticBtn = $(
-				'<button class="btn btn-sm btn-info">🖼️ Image Debug</button>'
+				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
 			);
 			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
 			
+			const unifiedSearchTestBtn = $(
+				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
+			);
+			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
+			
 			diagnosticContainer.append(searchDiagnosticBtn);
 			diagnosticContainer.append(imageDiagnosticBtn);
+			diagnosticContainer.append(unifiedSearchTestBtn);
 			$(".showcase-container").append(diagnosticContainer);
 		}
 	},
@@ -114,6 +120,22 @@ showcase = {
 				if (r.message) {
 					console.log("Image Diagnostic Results:", r.message);
 					showcase.showDiagnosticResults(r.message, "Image Diagnostic Results");
+				}
+			},
+		});
+	},
+
+	// Test unified search functionality
+	testUnifiedSearch: function () {
+		const query = $("#product-search").val() || "test";
+
+		frappe.call({
+			method: "showcase.api.products.test_unified_search",
+			args: { query: query },
+			callback: function (r) {
+				if (r.message) {
+					console.log("Unified Search Test Results:", r.message);
+					showcase.showDiagnosticResults(r.message, "Unified Search Test Results");
 				}
 			},
 		});
@@ -151,25 +173,31 @@ showcase = {
 
 	// Handle search input with debouncing
 	handleSearchInput: function (query) {
+		clearTimeout(this.searchTimeout);
 
-		console.log("handleSearchInput: ", query);
-		showcase.searchByItemCode(query);
+		if (query === this.lastSearchQuery) return;
+		this.lastSearchQuery = query;
+
+		if (query.length < 2) {
+			this.hideSuggestions();
+			this.loadProducts();
+			return;
+		}
+
+		// Show loading state for suggestions
+		this.showSearchLoading();
+
+		this.searchTimeout = setTimeout(() => {
+			this.performUnifiedSearch(query);
+		}, 300); // 300ms debounce for performance
 	},
 
 	// Handle Enter key press
 	handleEnterKey: function (query) {
 		if (!query.trim()) return;
 
-		// Check if it looks like an item code (alphanumeric, typically 6-20 chars)
-		const itemCodePattern = /^[A-Za-z0-9-_]{3,20}$/;
-
-		// if (itemCodePattern.test(query.trim())) {
-			// Search for specific item code
-			this.searchByItemCode(query.trim());
-		// } else {
-			// Perform regular search
-			// this.performSearch(query);
-		// }
+		// Use unified search for Enter key as well
+		this.performUnifiedSearchDirect(query.trim());
 	},
 
 	// Search by specific item code
@@ -200,7 +228,57 @@ showcase = {
 		});
 	},
 
-	// Perform search with suggestions
+	// Perform unified search with suggestions (for typing)
+	performUnifiedSearch: function (query) {
+		frappe.call({
+			method: "showcase.api.products.search_product_unified",
+			args: {
+				query: query,
+			},
+			callback: function (r) {
+				if (r.message && r.message.length > 0) {
+					console.log("Unified search results:", r.message);
+					showcase.showSearchSuggestions(r.message);
+				} else {
+					showcase.hideSuggestions();
+				}
+			},
+			error: function () {
+				showcase.hideSearchLoading();
+			},
+		});
+	},
+
+	// Perform unified search direct (for Enter key)
+	performUnifiedSearchDirect: function (query) {
+		console.log("performUnifiedSearchDirect: ", query);
+		this.showLoading();
+		this.hideSuggestions();
+
+		frappe.call({
+			method: "showcase.api.products.search_product_unified",
+			args: {
+				query: query,
+			},
+			callback: function (r) {
+				showcase.hideLoading();
+				if (r.message && r.message.length > 0) {
+					console.log("Direct unified search results:", r.message);
+					// Show the first product details directly
+					showcase.showProductDetails(r.message[0].name);
+				} else {
+					showcase.showNoProducts();
+					frappe.show_alert(__("No product found for: {0}", [query]), 3);
+				}
+			},
+			error: function () {
+				showcase.hideLoading();
+				showcase.showNoProducts();
+			},
+		});
+	},
+
+	// Perform search with suggestions (legacy method - kept for compatibility)
 	performSearch: function (query) {
 		frappe.call({
 			method: "showcase.api.products.search_products",
@@ -230,6 +308,11 @@ showcase = {
 		}
 
 		products.forEach((product) => {
+			// Add search method indicator for debugging (only for System Managers)
+			const searchMethodBadge = product.search_method && frappe.user.has_role("System Manager") 
+				? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>` 
+				: '';
+			
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
@@ -238,8 +321,8 @@ showcase = {
                              class="mr-3"
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
                              onerror="this.src='/assets/showcase/images/default-product.png'">
-                        <div>
-                            <div class="font-weight-bold">${product.item_name}</div>
+                        <div class="flex-grow-1">
+                            <div class="font-weight-bold">${product.item_name}${searchMethodBadge}</div>
                             <div class="text-muted small">${product.item_code || ""}</div>
                         </div>
                     </div>
@@ -425,14 +508,15 @@ showcase = {
 
 	// Scan barcode functionality
 	scanBarcode: function () {
+		console.log("scanBarcode: ", this.searchKeyword);
 
-		console.log("scanBarcode: ", searchKeyword);
+		if (!this.searchKeyword || !this.searchKeyword.trim()) {
+			frappe.show_alert(__("Please enter a barcode or item code to search"), 3);
+			return;
+		}
 
-		// Implementation for barcode scanning
-		// This would integrate with a barcode scanner library
-		// frappe.show_alert(__("Barcode scanning functionality coming soon!"), 3);
-		// showcase.searchKeyword = searchKeyword;
-		showcase.handleSearchInput(searchKeyword);
+		// Use direct unified search for barcode scanning
+		this.performUnifiedSearchDirect(this.searchKeyword.trim());
 	},
 };
 
