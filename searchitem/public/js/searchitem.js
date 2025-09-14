@@ -3,10 +3,9 @@
 frappe.provide("searchitem");
 
 // Debug: Check if frappe is available
-console.log("Showcase JS loaded. Frappe available:", typeof frappe !== "undefined");
+console.log("Searchitem JS loaded. Frappe available:", typeof frappe !== "undefined");
 
 searchitem = {
-
 	searchKeyword: "",
 
 	// Initialize the searchitem app
@@ -70,23 +69,25 @@ searchitem = {
 	addDiagnosticButton: function () {
 		// Add a small diagnostic button (only visible in development)
 		if (frappe.user.has_role("System Manager")) {
-			const diagnosticContainer = $('<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>');
-			
+			const diagnosticContainer = $(
+				'<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>'
+			);
+
 			const searchDiagnosticBtn = $(
 				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
 			);
 			searchDiagnosticBtn.click(() => this.runDiagnostic());
-			
+
 			const imageDiagnosticBtn = $(
 				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
 			);
 			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
-			
+
 			const unifiedSearchTestBtn = $(
 				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
 			);
 			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
-			
+
 			diagnosticContainer.append(searchDiagnosticBtn);
 			diagnosticContainer.append(imageDiagnosticBtn);
 			diagnosticContainer.append(unifiedSearchTestBtn);
@@ -295,10 +296,11 @@ searchitem = {
 
 		products.forEach((product) => {
 			// Add search method indicator for debugging (only for System Managers)
-			const searchMethodBadge = product.search_method && frappe.user.has_role("System Manager") 
-				? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>` 
-				: '';
-			
+			const searchMethodBadge =
+				product.search_method && frappe.user.has_role("System Manager")
+					? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
+					: "";
+
 			const suggestionItem = `
                 <div class="suggestion-item" data-product-id="${product.name}">
                     <div class="d-flex align-items-center">
@@ -308,7 +310,9 @@ searchitem = {
                              style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
                              onerror="this.src='/assets/searchitem/images/default-product.png'">
                         <div class="flex-grow-1">
-                            <div class="font-weight-bold">${product.item_name}${searchMethodBadge}</div>
+                            <div class="font-weight-bold">${
+								product.item_name
+							}${searchMethodBadge}</div>
                             <div class="text-muted small">${product.item_code || ""}</div>
                         </div>
                     </div>
@@ -349,9 +353,7 @@ searchitem = {
 	// Show search loading
 	showSearchLoading: function () {
 		const suggestionsContainer = $("#search-suggestions");
-		suggestionsContainer.html(
-			'<div class="p-3 text-center text-muted">Searching...</div>'
-		);
+		suggestionsContainer.html('<div class="p-3 text-center text-muted">Searching...</div>');
 		suggestionsContainer.show();
 	},
 
@@ -452,7 +454,7 @@ searchitem = {
 					<div class="product-details-simple">
 						<div class="detail-row">
 							<span class="detail-label">ชื่อสินค้า:</span>
-							<span class="detail-value">${product.item_name }</span>
+							<span class="detail-value">${product.item_name}</span>
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">รหัสบาร์โค้ด:</span>
@@ -464,22 +466,32 @@ searchitem = {
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">คงเหลือ:</span>
-							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}</span>
+							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${
+			product.stock_uom || "หน่วย"
+		}</span>
 						</div>
 						<div class="detail-row">
 							<span class="detail-label">หมวดหมู่:</span>
 							<span class="detail-value">${product.item_group || "ไม่ระบุ"}</span>
 						</div>
-						${product.brand ? `
+						${
+							product.brand
+								? `
 						<div class="detail-row">
 							<span class="detail-label">แบรนด์:</span>
 							<span class="detail-value">${product.brand}</span>
-						</div>` : ''}
-						${product.weight_per_unit ? `
+						</div>`
+								: ""
+						}
+						${
+							product.weight_per_unit
+								? `
 						<div class="detail-row">
 							<span class="detail-label">น้ำหนัก:</span>
 							<span class="detail-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</span>
-						</div>` : ''}
+						</div>`
+								: ""
+						}
 					</div>
 				</div>
 				
@@ -487,7 +499,9 @@ searchitem = {
 					<button class="btn btn-success action-btn" onclick="searchitem.printProductInfo()">
 						พิมพ์ข้อมูล
 					</button>
-					<button class="btn btn-warning action-btn" onclick="searchitem.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')">
+					<button class="btn btn-warning action-btn" onclick="searchitem.showImageModal('${imageUrl}', '${
+			product.item_name
+		}', '${product.item_code}')">
 						ดูรูปภาพ
 					</button>
 				</div>
@@ -498,7 +512,7 @@ searchitem = {
 	},
 
 	// Get stock status for styling
-	getStockStatus: function(stockQty) {
+	getStockStatus: function (stockQty) {
 		const qty = parseFloat(stockQty) || 0;
 		if (qty <= 0) {
 			return { status: "out_of_stock", class: "text-danger", text: "หมด" };
@@ -510,11 +524,15 @@ searchitem = {
 	},
 
 	// Get stock badge
-	getStockBadge: function(stockQty) {
+	getStockBadge: function (stockQty) {
 		const status = this.getStockStatus(stockQty);
-		const badgeClass = status.status === "out_of_stock" ? "badge-danger" : 
-						   status.status === "low_stock" ? "badge-warning" : "badge-success";
-		
+		const badgeClass =
+			status.status === "out_of_stock"
+				? "badge-danger"
+				: status.status === "low_stock"
+				? "badge-warning"
+				: "badge-success";
+
 		return `<span class="badge ${badgeClass} badge-lg">
 					Stock: ${status.text}
 				</span>`;
@@ -528,32 +546,32 @@ searchitem = {
 	},
 
 	// Show image in modal (defined here for consistency)
-	showImageModal: function(imageSrc, productName, productCode) {
-		if (!imageSrc || imageSrc.includes('default-product.png')) {
+	showImageModal: function (imageSrc, productName, productCode) {
+		if (!imageSrc || imageSrc.includes("default-product.png")) {
 			frappe.show_alert(__("ไม่มีรูปภาพสำหรับสินค้านี้"), 3);
 			return;
 		}
-		
-		$('#modalImage').attr('src', imageSrc);
-		$('#imageProductName').text(productName);
-		$('#imageProductCode').text(productCode);
-		$('#imageModal').modal('show');
+
+		$("#modalImage").attr("src", imageSrc);
+		$("#imageProductName").text(productName);
+		$("#imageProductCode").text(productCode);
+		$("#imageModal").modal("show");
 	},
 
 	// Download image function (defined here for consistency)
-	downloadImage: function() {
-		const imageSrc = $('#modalImage').attr('src');
-		const productName = $('#imageProductName').text();
-		
-		if (imageSrc && !imageSrc.includes('default-product.png')) {
-			const link = document.createElement('a');
+	downloadImage: function () {
+		const imageSrc = $("#modalImage").attr("src");
+		const productName = $("#imageProductName").text();
+
+		if (imageSrc && !imageSrc.includes("default-product.png")) {
+			const link = document.createElement("a");
 			link.href = imageSrc;
-			link.download = `${productName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_image.jpg`;
-			link.target = '_blank';
+			link.download = `${productName.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_image.jpg`;
+			link.target = "_blank";
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-			
+
 			frappe.show_alert(__("กำลังดาวน์โหลดรูปภาพ..."), 2);
 		} else {
 			frappe.show_alert(__("ไม่สามารถดาวน์โหลดรูปภาพได้"), 3);
@@ -561,7 +579,7 @@ searchitem = {
 	},
 
 	// Print product info function (defined here for consistency)
-	printProductInfo: function() {
+	printProductInfo: function () {
 		if (this.currentProductId) {
 			// Add print-specific styles
 			const printStyles = `
@@ -574,14 +592,14 @@ searchitem = {
 					}
 				</style>
 			`;
-			
-			if (!document.getElementById('print-styles')) {
-				const style = document.createElement('style');
-				style.id = 'print-styles';
-				style.innerHTML = printStyles.replace('<style>', '').replace('</style>', '');
+
+			if (!document.getElementById("print-styles")) {
+				const style = document.createElement("style");
+				style.id = "print-styles";
+				style.innerHTML = printStyles.replace("<style>", "").replace("</style>", "");
 				document.head.appendChild(style);
 			}
-			
+
 			setTimeout(() => {
 				window.print();
 			}, 100);
@@ -591,13 +609,13 @@ searchitem = {
 	},
 
 	// Clear search function (defined here for consistency)
-	clearSearch: function() {
-		$('#product-search').val('').focus();
-		this.searchKeyword = '';
+	clearSearch: function () {
+		$("#product-search").val("").focus();
+		this.searchKeyword = "";
 		this.hideSuggestions();
-		$('#product-detail').hide();
-		$('#no-products').hide();
-		$('#loading-state').hide();
+		$("#product-detail").hide();
+		$("#no-products").hide();
+		$("#loading-state").hide();
 	},
 
 	// Scan barcode functionality
