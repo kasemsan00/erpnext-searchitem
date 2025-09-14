@@ -462,42 +462,42 @@ showcase = {
 					</div>
 				</div>
 				
-				<div class="product-info-grid">
-					<div class="product-main-info">
-						<h4 class="product-detail-title">${product.item_name}</h4>
-						<div class="product-detail-code">รหัสสินค้า: ${product.item_code || "ไม่มีรหัส"}</div>
-						<div class="product-detail-price">${price}</div>
-						${product.description ? `<div class="product-detail-description">${product.description}</div>` : ''}
-					</div>
-					
-					<div class="product-stats-grid">
-						<div class="stat-card">
-							<div class="stat-label">คงเหลือ</div>
-							<div class="stat-value ${stockStatus.class}">
-								${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}
-							</div>
+				<div class="product-info-simple">
+					<div class="product-details-simple">
+						<div class="detail-row">
+							<span class="detail-label">ชื่อสินค้า:</span>
+							<span class="detail-value">${product.item_name }</span>
 						</div>
-						<div class="stat-card">
-							<div class="stat-label">หมวดหมู่</div>
-							<div class="stat-value">${product.item_group || "ไม่ระบุ"}</div>
+						<div class="detail-row">
+							<span class="detail-label">รหัสบาร์โค้ด:</span>
+							<span class="detail-value">${product.barcode || "ไม่มีรหัส"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">รหัสสินค้า:</span>
+							<span class="detail-value">${product.item_code || "ไม่มีรหัส"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">คงเหลือ:</span>
+							<span class="detail-value ${stockStatus.class}">${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">หมวดหมู่:</span>
+							<span class="detail-value">${product.item_group || "ไม่ระบุ"}</span>
 						</div>
 						${product.brand ? `
-						<div class="stat-card">
-							<div class="stat-label">แบรนด์</div>
-							<div class="stat-value">${product.brand}</div>
+						<div class="detail-row">
+							<span class="detail-label">แบรนด์:</span>
+							<span class="detail-value">${product.brand}</span>
 						</div>` : ''}
 						${product.weight_per_unit ? `
-						<div class="stat-card">
-							<div class="stat-label">น้ำหนัก</div>
-							<div class="stat-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</div>
+						<div class="detail-row">
+							<span class="detail-label">น้ำหนัก:</span>
+							<span class="detail-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</span>
 						</div>` : ''}
 					</div>
 				</div>
 				
 				<div class="product-actions">
-					<button class="btn btn-info action-btn" onclick="showcase.viewFullDetails('${product.name}')">
-						ดูข้อมูลใน ERPNext
-					</button>
 					<button class="btn btn-success action-btn" onclick="showcase.printProductInfo()">
 						พิมพ์ข้อมูล
 					</button>
