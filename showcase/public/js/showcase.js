@@ -1,4 +1,4 @@
-// ERPNext Showcase App JavaScript
+// Search item App JavaScript
 
 frappe.provide("showcase");
 
@@ -23,7 +23,7 @@ showcase = {
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log("Key pressed kasemsan:", e.key);
+			console.log("Key pressed :", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
@@ -147,17 +147,18 @@ showcase = {
 		// Check if it looks like an item code (alphanumeric, typically 6-20 chars)
 		const itemCodePattern = /^[A-Za-z0-9-_]{3,20}$/;
 
-		if (itemCodePattern.test(query.trim())) {
+		// if (itemCodePattern.test(query.trim())) {
 			// Search for specific item code
 			this.searchByItemCode(query.trim());
-		} else {
+		// } else {
 			// Perform regular search
-			this.performSearch(query);
-		}
+			// this.performSearch(query);
+		// }
 	},
 
 	// Search by specific item code
 	searchByItemCode: function (itemCode) {
+		console.log("searchByItemCode: ", itemCode);
 		this.showLoading();
 		this.hideSuggestions();
 
@@ -317,6 +318,7 @@ showcase = {
 				product_id: productId,
 			},
 			callback: function (r) {
+				console.log("showProductDetails: ", r);
 				showcase.hideLoading();
 				if (r.message) {
 					showcase.renderProductDetail(r.message);
@@ -332,6 +334,7 @@ showcase = {
 
 	// Render product detail on page
 	renderProductDetail: function (product) {
+		console.log("renderProductDetail: ", product);
 		const detailContainer = $("#product-detail");
 		const price = this.formatPrice(product.standard_rate);
 

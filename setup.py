@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ERPNext Showcase App Setup
+Search item App Setup
 A simple setup file for Frappe app installation
 """
 
@@ -22,7 +22,7 @@ def get_version():
 # App metadata
 APP_NAME = "showcase"
 APP_VERSION = get_version()
-APP_DESCRIPTION = "ERPNext Showcase - Show products by scan barcode or search by name"
+APP_DESCRIPTION = "Search item - Show products by scan barcode or search by name"
 APP_AUTHOR = "kasemsan"
 APP_AUTHOR_EMAIL = "kasemsan.cho@gmail.com"
 APP_LICENSE = "MIT"

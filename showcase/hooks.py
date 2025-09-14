@@ -1,5 +1,5 @@
 app_name = "showcase"
-app_title = "ERPNext Showcase"
+app_title = "Search item"
 app_publisher = "kasemsan"
 app_description = "Show product by scan barcode or search by name"
 app_email = "kasemsan.cho@gmail.com"
@@ -16,7 +16,7 @@ add_to_apps_screen = [
 	{
 		"name": "showcase",
 		"logo": "/assets/showcase/logo.png",
-		"title": "ERPNext Showcase",
+		"title": "Search item",
 		"route": "/showcase",
 		"has_permission": "showcase.api.permission.has_app_permission"
 	}

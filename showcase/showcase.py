@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-ERPNext Showcase Module
-=======================
+Search item Module
+==================
 
-This module handles the showcase functionality for displaying products
+This module handles the search item functionality for displaying products
 by scanning barcode or searching by name.
 """
 
@@ -13,7 +13,7 @@ from frappe import _
 def get_context(context):
     """Get context for showcase pages"""
     context.update({
-        "title": _("ERPNext Showcase"),
+        "title": _("Search item"),
         "showcase_products": get_showcase_products()
     })
 

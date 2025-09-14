@@ -1,4 +1,4 @@
-# ERPNext Showcase App Requirements
+# Search item App Requirements
 # Frappe framework is managed by bench and not included here
 
 # No additional dependencies required for basic functionality
