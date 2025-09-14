@@ -11,6 +11,16 @@
 				border-radius: 0 4px 4px 0;
 			}
 		}
+
+		// Prevent background changes on hover and focus
+		.search-input {
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: none !important;
+				background-image: none !important;
+			}
+		}
 	}
 
 	.showcase-product-grid {

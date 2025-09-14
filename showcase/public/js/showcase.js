@@ -431,79 +431,187 @@ showcase = {
 		});
 	},
 
-	// Render product detail on page
+	// Render product detail on page with enhanced stock management UI
 	renderProductDetail: function (product) {
 		console.log("renderProductDetail: ", product);
-		const detailContainer = $("#product-detail");
+		const detailContainer = $("#product-detail .product-card");
 		const price = this.formatPrice(product.standard_rate);
+		const imageUrl = this.getSafeImageUrl(product.image);
+		const defaultImage = "/assets/showcase/images/default-product.png";
+
+		// Stock status indicator
+		const stockStatus = this.getStockStatus(product.stock_qty);
+		const stockBadge = this.getStockBadge(product.stock_qty);
 
 		const content = `
-            <div class="row">
-                <div class="col-md-5">
-                    <img src="${this.getSafeImageUrl(product.image)}" 
-                         alt="${product.item_name}" 
-                         class="product-detail-image"
-                         onerror="this.src='/assets/showcase/images/default-product.png'">
-                </div>
-                <div class="col-md-7">
-                    <div class="product-detail-title">${product.item_name}</div>
-                    <div class="product-detail-code">${product.item_code || ""}</div>
-                    <div class="product-detail-price">${price}</div>
-                    ${
-						product.description
-							? `<div class="product-detail-description">${product.description}</div>`
-							: ""
-					}
-                    
-                    <div class="product-detail-info">
-                        ${
-							product.item_group
-								? `<div class="info-item">
-                                    <span class="info-label">หมวดหมู่:</span>
-                                    <span class="info-value">${product.item_group}</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.brand
-								? `<div class="info-item">
-                                    <span class="info-label">แบรนด์:</span>
-                                    <span class="info-value">${product.brand}</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.weight_per_unit
-								? `<div class="info-item">
-                                    <span class="info-label">น้ำหนัก:</span>
-                                    <span class="info-value">${product.weight_per_unit} ${
-										product.weight_uom || "kg"
-								  }</span>
-                                </div>`
-								: ""
-						}
-                        ${
-							product.stock_qty !== undefined
-								? `<div class="info-item">
-                                    <span class="info-label">คงเหลือ:</span>
-                                    <span class="info-value">${product.stock_qty || 0} ${
-										product.stock_uom || "หน่วย"
-								  }</span>
-                                </div>`
-								: ""
-						}
-                    </div>
-                </div>
-            </div>
+			<div class="product-header">
+				<h2><i class="fa fa-box"></i> รายละเอียดสินค้า</h2>
+				<div class="product-actions-header">
+					${stockBadge}
+				</div>
+			</div>
+			<div class="product-body">
+				<div class="product-image-container">
+					<img src="${imageUrl}" 
+						 alt="${product.item_name}" 
+						 class="product-detail-image"
+						 onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')"
+						 onerror="this.src='${defaultImage}'">
+					<div class="image-overlay">
+						<i class="fa fa-search-plus"></i> คลิกเพื่อขยาย
+					</div>
+				</div>
+				
+				<div class="product-info-grid">
+					<div class="product-main-info">
+						<h3 class="product-detail-title">${product.item_name}</h3>
+						<div class="product-detail-code">${product.item_code || "ไม่มีรหัส"}</div>
+						<div class="product-detail-price">${price}</div>
+						${product.description ? `<div class="product-detail-description">${product.description}</div>` : ''}
+					</div>
+					
+					<div class="product-stats-grid">
+						<div class="stat-card">
+							<div class="stat-label">คงเหลือ</div>
+							<div class="stat-value ${stockStatus.class}">
+								${product.stock_qty || 0} ${product.stock_uom || "หน่วย"}
+							</div>
+						</div>
+						<div class="stat-card">
+							<div class="stat-label">หมวดหมู่</div>
+							<div class="stat-value">${product.item_group || "ไม่ระบุ"}</div>
+						</div>
+						${product.brand ? `
+						<div class="stat-card">
+							<div class="stat-label">แบรนด์</div>
+							<div class="stat-value">${product.brand}</div>
+						</div>` : ''}
+						${product.weight_per_unit ? `
+						<div class="stat-card">
+							<div class="stat-label">น้ำหนัก</div>
+							<div class="stat-value">${product.weight_per_unit} ${product.weight_uom || "kg"}</div>
+						</div>` : ''}
+					</div>
+				</div>
+				
+				<div class="product-actions">
+					<button class="btn btn-info action-btn" onclick="showcase.viewFullDetails('${product.name}')">
+						<i class="fa fa-external-link-alt"></i> ดูข้อมูลใน ERPNext
+					</button>
+					<button class="btn btn-success action-btn" onclick="showcase.printProductInfo()">
+						<i class="fa fa-print"></i> พิมพ์ข้อมูล
+					</button>
+					<button class="btn btn-warning action-btn" onclick="showcase.showImageModal('${imageUrl}', '${product.item_name}', '${product.item_code}')">
+						<i class="fa fa-image"></i> ดูรูปภาพ
+					</button>
+				</div>
+			</div>
         `;
 
 		detailContainer.html(content);
 	},
 
+	// Get stock status for styling
+	getStockStatus: function(stockQty) {
+		const qty = parseFloat(stockQty) || 0;
+		if (qty <= 0) {
+			return { status: "out_of_stock", class: "text-danger", text: "หมด" };
+		} else if (qty <= 10) {
+			return { status: "low_stock", class: "text-warning", text: "ต่ำ" };
+		} else {
+			return { status: "in_stock", class: "text-success", text: "ปกติ" };
+		}
+	},
+
+	// Get stock badge
+	getStockBadge: function(stockQty) {
+		const status = this.getStockStatus(stockQty);
+		const badgeClass = status.status === "out_of_stock" ? "badge-danger" : 
+						   status.status === "low_stock" ? "badge-warning" : "badge-success";
+		
+		return `<span class="badge ${badgeClass} badge-lg">
+					<i class="fa fa-warehouse"></i> Stock: ${status.text}
+				</span>`;
+	},
+
 	// View full details in ERPNext form
 	viewFullDetails: function (productId) {
 		$("#productDetailModal").modal("hide");
+		$("#imageModal").modal("hide");
 		frappe.set_route("Form", "Item", productId);
+	},
+
+	// Show image in modal (defined here for consistency)
+	showImageModal: function(imageSrc, productName, productCode) {
+		if (!imageSrc || imageSrc.includes('default-product.png')) {
+			frappe.show_alert(__("ไม่มีรูปภาพสำหรับสินค้านี้"), 3);
+			return;
+		}
+		
+		$('#modalImage').attr('src', imageSrc);
+		$('#imageProductName').text(productName);
+		$('#imageProductCode').text(productCode);
+		$('#imageModal').modal('show');
+	},
+
+	// Download image function (defined here for consistency)
+	downloadImage: function() {
+		const imageSrc = $('#modalImage').attr('src');
+		const productName = $('#imageProductName').text();
+		
+		if (imageSrc && !imageSrc.includes('default-product.png')) {
+			const link = document.createElement('a');
+			link.href = imageSrc;
+			link.download = `${productName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_image.jpg`;
+			link.target = '_blank';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			
+			frappe.show_alert(__("กำลังดาวน์โหลดรูปภาพ..."), 2);
+		} else {
+			frappe.show_alert(__("ไม่สามารถดาวน์โหลดรูปภาพได้"), 3);
+		}
+	},
+
+	// Print product info function (defined here for consistency)
+	printProductInfo: function() {
+		if (this.currentProductId) {
+			// Add print-specific styles
+			const printStyles = `
+				<style>
+					@media print {
+						body * { visibility: hidden; }
+						#product-detail, #product-detail * { visibility: visible; }
+						#product-detail { position: absolute; left: 0; top: 0; width: 100%; }
+						.product-actions, .search-section, .stock-header { display: none !important; }
+					}
+				</style>
+			`;
+			
+			if (!document.getElementById('print-styles')) {
+				const style = document.createElement('style');
+				style.id = 'print-styles';
+				style.innerHTML = printStyles.replace('<style>', '').replace('</style>', '');
+				document.head.appendChild(style);
+			}
+			
+			setTimeout(() => {
+				window.print();
+			}, 100);
+		} else {
+			frappe.show_alert(__("ไม่มีข้อมูลสินค้าให้พิมพ์"), 3);
+		}
+	},
+
+	// Clear search function (defined here for consistency)
+	clearSearch: function() {
+		$('#product-search').val('').focus();
+		this.searchKeyword = '';
+		this.hideSuggestions();
+		$('#product-detail').hide();
+		$('#no-products').hide();
+		$('#loading-state').hide();
 	},
 
 	// Scan barcode functionality

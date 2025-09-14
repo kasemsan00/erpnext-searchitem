@@ -1,100 +1,163 @@
-{% extends "templates/web.html" %} {% block title %}{{ _("Search item") }}{% endblock %} {%
+{% extends "templates/web.html" %} {% block title %}{{ _("Stock Management - Product Search") }}{% endblock %} {%
 block page_content %}
-<div class="showcase-container">
-	<!-- Header Section -->
-	<div class="showcase-header">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="showcase-title-section">
-					<h1 class="showcase-title">ค้นหาสินค้า  บาร์โค้ด</h1>
+<div class="stock-management-container">
+	<!-- Header Section with Stock Management Theme -->
+	<div class="stock-header">
+		<div class="container-fluid">
+			<div class="row align-items-center">
+				<div class="col-md-8">
+					<div class="header-content">
+						<h1 class="header-title">
+							ระบบจัดการสินค้า
+						</h1>
+						<p class="header-subtitle">ค้นหาและตรวจสอบข้อมูลสินค้าสำหรับการจัด Stock</p>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Search Section -->
-	<div class="row mb-4">
-		<div class="col-md-8 mx-auto">
-			<div class="showcase-search-container">
-				<div class="search-input-wrapper">
-					<div class="search-icon">
-						<i class="fa fa-search"></i>
+	<!-- Enhanced Search Section -->
+	<div class="search-section">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="search-card">
+						<div class="search-header">
+							<h3> ค้นหาสินค้า</h3>
+							<small class="">สแกนบาร์โค้ด หรือ ค้นหาจากรหัส/ชื่อสินค้า</small>
+						</div>
+						<div class="search-body">
+							<div class="search-input-group">
+								<div class="input-with-icon">
+									<i class="fa fa-barcode search-icon"></i>
+									<input
+										type="text"
+										class="form-control search-input"
+										placeholder="สแกนบาร์โค้ด หรือ พิมพ์รหัส/ชื่อสินค้า..."
+										id="product-search"
+										autocomplete="off"
+									/>
+									<div class="search-buttons">
+										<button
+											class="btn btn-success search-btn"
+											type="button"
+											onclick="showcase.scanBarcode()"
+											title="ค้นหา"
+										>
+											<i class="fa fa-search"></i> ค้นหา
+										</button>
+										<button
+											class="btn btn-outline-secondary clear-btn"
+											type="button"
+											onclick="showcase.clearSearch()"
+											title="ล้างข้อมูล"
+										>
+											<i class="fa fa-times"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="search-tips">
+								<i class="fa fa-info-circle text-info"></i>
+								<span>เคล็ดลับ: ใช้เครื่องสแกนบาร์โค้ด หรือพิมพ์รหัสสินค้าแล้วกด Enter</span>
+							</div>
+						</div>
+						<div class="search-suggestions" id="search-suggestions" style="display: none">
+							<!-- Search suggestions will appear here -->
+						</div>
 					</div>
-					<input
-						type="text"
-						class="form-control showcase-search-input"
-						placeholder="{{ _('ค้นหาสินค้า, บาร์โค้ด...') }}"
-						id="product-search"
-						autocomplete="off"
-					/>
-					<div class="search-actions">
-						<button
-							class="btn btn-primary rounded-pill py-2"
-							type="button"
-							onclick="showcase.scanBarcode()"
-							title="{{ _('Scan Barcode') }}"
-						>
-							ค้นหาบาร์โค้ด
-						</button>
-					</div>
-				</div>
-				<div class="search-suggestions" id="search-suggestions" style="display: none">
-					<!-- Search suggestions will appear here -->
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<!-- Loading State -->
-	<div class="row" id="loading-state" style="display: none">
-		<div class="col-md-12 text-center">
-			<div class="showcase-loading">
-				<div class="spinner-border text-primary" role="status">
-					<span class="sr-only">Loading...</span>
+	<div class="loading-section" id="loading-state" style="display: none">
+		<div class="container-fluid">
+			<div class="loading-card">
+				<div class="loading-content">
+					<div class="loading-spinner">
+						<div class="spinner-border text-primary" role="status">
+							<span class="sr-only">Loading...</span>
+						</div>
+					</div>
+					<p class="loading-text">กำลังค้นหาสินค้า...</p>
 				</div>
-				<p class="mt-2 text-muted">{{ _("Loading products...") }}</p>
 			</div>
 		</div>
 	</div>
 
-	<!-- Product Detail Section -->
-	<div class="row">
-		<div class="col-md-12">
-			<div class="showcase-product-detail" id="product-detail" style="display: none">
+	<!-- Enhanced Product Detail Section -->
+	<div class="product-section" id="product-detail" style="display: none">
+		<div class="container-fluid">
+			<div class="product-card">
 				<!-- Product details will be displayed here -->
 			</div>
 		</div>
 	</div>
 
-	<!-- No Products Message -->
-	<div class="row" id="no-products" style="display: none">
-		<div class="col-md-12 text-center">
-			<div class="showcase-empty-state">
-				<div class="empty-state-icon">
-					<i class="fa fa-search"></i>
+	<!-- Enhanced No Products Message -->
+	<div class="no-products-section" id="no-products" style="display: none">
+		<div class="container-fluid">
+			<div class="no-products-card">
+				<div class="no-products-content">
+					<div class="no-products-icon">
+						<i class="fa fa-search-minus"></i>
+					</div>
+					<h3>ไม่พบสินค้า</h3>
+					<p class="text-muted">ไม่พบสินค้าที่ตรงกับการค้นหา กรุณาตรวจสอบ:</p>
+					<ul class="search-suggestions-list">
+						<li>รหัสสินค้าถูกต้อง</li>
+						<li>บาร์โค้ดสแกนได้ชัดเจน</li>
+						<li>สินค้าอยู่ในระบบ</li>
+					</ul>
+					<button class="btn btn-primary" onclick="$('#product-search').focus()">
+						<i class="fa fa-search"></i> ค้นหาอีกครั้ง
+					</button>
 				</div>
-				<h4>{{ _("ไม่พบสินค้า") }}</h4>
-				<p class="text-muted">{{ _("ลองปรับปรุงการคำค้นหา หรือค้นหาจากรหัสสินค้า") }}</p>
 			</div>
 		</div>
 	</div>
 
-	<!-- Product Detail Modal -->
-	<div
-		class="modal fade"
-		id="productDetailModal"
-		tabindex="-1"
-		role="dialog"
-		aria-labelledby="productDetailModalLabel"
-		aria-hidden="true"
-	>
-		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content">
+	<!-- Image Zoom Modal -->
+	<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+			<div class="modal-content image-modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="productDetailModalLabel">
-						{{ _("Product Details") }}
-					</h5>
+					<h5 class="modal-title" id="imageModalTitle">รูปภาพสินค้า</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body text-center">
+					<img id="modalImage" src="" alt="Product Image" class="img-fluid zoom-image">
+					<div class="image-info mt-3">
+						<h6 id="imageProductName"></h6>
+						<small id="imageProductCode" class="text-muted"></small>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
+						<i class="fa fa-times"></i> ปิด
+					</button>
+					<button type="button" class="btn btn-primary" onclick="showcase.downloadImage()">
+						<i class="fa fa-download"></i> ดาวน์โหลด
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Product Detail Modal (Enhanced) -->
+	<div class="modal fade" id="productDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title">
+						<i class="fa fa-info-circle"></i> รายละเอียดสินค้า
+					</h5>
+					<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -103,10 +166,13 @@ block page_content %}
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">
-						{{ _("Close") }}
+						<i class="fa fa-times"></i> ปิด
+					</button>
+					<button type="button" class="btn btn-info" onclick="showcase.printProductInfo()">
+						<i class="fa fa-print"></i> พิมพ์ข้อมูล
 					</button>
 					<button type="button" class="btn btn-primary" id="viewFullDetails">
-						{{ _("View Full Details") }}
+						<i class="fa fa-external-link-alt"></i> ดูข้อมูลใน ERPNext
 					</button>
 				</div>
 			</div>
@@ -115,249 +181,649 @@ block page_content %}
 </div>
 {% endblock %} {% block style %}
 <style>
-	/* Modern Showcase Styles */
-	.showcase-container {
-		min-height: 80vh;
-		background: transparent;
-		padding: 0;
+	/* Stock Management UI Styles */
+	body {
+		background: #f8f9fa;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	}
 
-	.showcase-header {
-		padding: 3rem 0;
-		margin-bottom: 2rem;
-		text-align: center;
+	.stock-management-container {
+		min-height: 100vh;
+		background-attachment: fixed;
 	}
 
-	.showcase-title {
-		font-size: 2.5rem;
+	/* Header Section */
+	.stock-header {
+		backdrop-filter: blur(10px);
+		padding: 1rem 0;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+
+	.header-content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.header-title {
+		font-size: 1.8rem;
 		font-weight: 700;
-		margin-bottom: 0.5rem;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		color: #2c3e50;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
-	.showcase-subtitle {
-		font-size: 1.1rem;
-		opacity: 0.9;
-		margin-bottom: 0;
+	.header-subtitle {
+		color: #6c757d;
+		margin: 0.25rem 0 0 0;
+		font-size: 0.95rem;
 	}
 
-	.showcase-search-container {
-		position: relative;
-		margin-bottom: 2rem;
+	.quick-stats {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
-	.search-input-wrapper {
-		text-align: center;
-		position: relative;
-		/* background: white; */
-		border-radius: 50px;
-		/* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); */
+	.stat-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: #495057;
+		font-size: 0.9rem;
+	}
+
+	/* Search Section */
+	.search-section {
+		/* padding: 2rem 0; */
+		padding-top: 2rem;
+	}
+
+	.search-card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 		overflow: hidden;
 		transition: all 0.3s ease;
-		border: 1px solid #e0e0e0;
 	}
 
-	.search-input-wrapper:focus-within {
-		/* box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); */
-		/* background-color: white; */
+	.search-card:hover {
+		box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+	}
+
+	.search-header {
+		background: linear-gradient(135deg, #4CAF50, #45a049);
+		color: white;
+		padding: 1.5rem 2rem;
+		border-bottom: none;
+	}
+
+	.search-header h3 {
+		margin: 0;
+		font-size: 1.4rem;
+		font-weight: 600;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.search-body {
+		padding: 2rem;
+	}
+
+	.search-input-group {
+		margin-bottom: 1rem;
+	}
+
+	.input-with-icon {
+		position: relative;
+		display: flex;
+		align-items: center;
+		background: #f8f9fa;
+		border-radius: 15px;
+		border: 2px solid #e9ecef;
+		transition: all 0.3s ease;
+		overflow: hidden;
+	}
+
+	.input-with-icon:focus-within {
+		border-color: #4CAF50;
+		box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+		background: white;
 	}
 
 	.search-icon {
 		position: absolute;
-		left: 25px;
-		top: 50%;
-		transform: translateY(-50%);
+		left: 1rem;
 		color: #6c757d;
+		font-size: 1.2rem;
 		z-index: 2;
-		font-size: 18px;
 	}
 
-	.showcase-search-input {
+	.search-input {
 		border: none !important;
-		padding: 25px 80px 25px 60px !important;
-		font-size: 20px;
+		padding: 1rem 1rem 1rem 3rem !important;
+		font-size: 1.1rem;
 		background: transparent;
 		box-shadow: none !important;
+		flex: 1;
 	}
 
-	.showcase-search-input:focus {
+	.search-input:focus {
 		box-shadow: none !important;
+		outline: none !important;
 	}
 
-	.search-actions {
-		position: absolute;
-		right: 8px;
-		top: 50%;
-		transform: translateY(-50%);
+	.search-buttons {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0.5rem;
 	}
 
-	.showcase-scan-btn {
-		border-radius: 50px;
-		padding: 12px 18px;
+	.search-btn {
+		border-radius: 10px;
+		padding: 0.75rem 1.5rem;
+		font-weight: 600;
 		border: none;
-		color: white;
 		transition: all 0.3s ease;
-		font-size: 16px;
 	}
 
-	.showcase-scan-btn:hover {
-		transform: scale(1.05);
-		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+	.search-btn:hover {
+		box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+	}
+
+	.clear-btn {
+		border-radius: 10px;
+		padding: 0.75rem;
+		transition: all 0.3s ease;
+	}
+
+	.search-tips {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: #6c757d;
+		font-size: 0.9rem;
+		background: #e3f2fd;
+		padding: 0.75rem 1rem;
+		border-radius: 10px;
 	}
 
 	.search-suggestions {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
 		background: white;
-		border-radius: 12px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		border-radius: 0 0 15px 15px;
+		box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
 		z-index: 1000;
-		max-height: 300px;
+		max-height: 400px;
 		overflow-y: auto;
-		margin-top: 5px;
+		margin: 0 2rem;
+		border-top: 1px solid #e9ecef;
 	}
 
 	.suggestion-item {
-		padding: 12px 20px;
+		padding: 1rem 1.5rem;
 		cursor: pointer;
 		border-bottom: 1px solid #f0f0f0;
-		transition: background-color 0.2s ease;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
 	}
 
 	.suggestion-item:hover {
-		background-color: #f8f9fa;
 	}
 
 	.suggestion-item:last-child {
 		border-bottom: none;
+		border-radius: 0 0 15px 15px;
 	}
 
-	.showcase-loading {
+	/* Loading Section */
+	.loading-section {
 		padding: 3rem 0;
 	}
 
-	.showcase-product-detail {
+	.loading-card {
 		background: white;
-		border-radius: 16px;
-		padding: 2rem;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-		margin: 2rem 1rem;
-		border: 1px solid rgba(0, 0, 0, 0.05);
+		border-radius: 20px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+		margin: 2rem;
 	}
 
-	.product-detail-image {
-		width: 100%;
-		max-width: 400px;
-		height: 300px;
-		object-fit: cover;
-		border-radius: 12px;
+	.loading-content {
+		padding: 3rem;
+		text-align: center;
+	}
+
+	.loading-spinner {
 		margin-bottom: 1rem;
 	}
 
-	.product-detail-title {
-		font-size: 2rem;
-		font-weight: 700;
-		margin-bottom: 0.5rem;
-		color: #2c3e50;
-		line-height: 1.2;
-	}
-
-	.product-detail-code {
-		font-size: 1rem;
+	.loading-text {
 		color: #6c757d;
-		margin-bottom: 1rem;
-		font-family: "Courier New", monospace;
-		background: #f8f9fa;
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		display: inline-block;
-	}
-
-	.product-detail-price {
-		font-size: 2rem;
-		color: #e74c3c;
-		font-weight: 700;
-		margin-bottom: 1.5rem;
-	}
-
-	.product-detail-description {
 		font-size: 1.1rem;
-		color: #495057;
-		line-height: 1.6;
-		margin-bottom: 1.5rem;
+		margin: 0;
 	}
 
-	.product-detail-info {
-		background: #f8f9fa;
-		padding: 1.5rem;
-		border-radius: 8px;
-		margin-top: 1rem;
+	/* Product Section */
+	.product-section {
+		padding: 2rem 0;
 	}
 
-	.product-detail-info .info-item {
-		margin-bottom: 0.75rem;
+	.product-card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+		margin: 2rem;
+		overflow: hidden;
+		animation: slideInUp 0.5s ease;
+	}
+
+	@keyframes slideInUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.product-header {
+		background: linear-gradient(135deg, #2196F3, #1976D2);
+		color: white;
+		padding: 1.5rem 2rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
-	.product-detail-info .info-item:last-child {
-		margin-bottom: 0;
-	}
-
-	.product-detail-info .info-label {
+	.product-header h2 {
+		margin: 0;
+		font-size: 1.5rem;
 		font-weight: 600;
-		color: #495057;
 	}
 
-	.product-detail-info .info-value {
+	.product-body {
+		padding: 2rem;
+	}
+
+	.product-image-container {
+		position: relative;
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+
+	.product-detail-image {
+		width: 100%;
+		max-width: 500px;
+		height: 350px;
+		object-fit: cover;
+		border-radius: 15px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		border: 3px solid #e9ecef;
+	}
+
+	.product-detail-image:hover {
+		transform: scale(1.02);
+		border-color: #2196F3;
+		box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3);
+	}
+
+	.image-overlay {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: rgba(0, 0, 0, 0.7);
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 20px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		pointer-events: none;
+	}
+
+	.product-image-container:hover .image-overlay {
+		opacity: 1;
+	}
+
+	.product-info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 2rem;
+		margin-top: 2rem;
+	}
+
+	.product-main-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.product-detail-title {
+		font-size: 2.2rem;
+		font-weight: 700;
+		color: #2c3e50;
+		line-height: 1.2;
+		margin: 0;
+	}
+
+	.product-detail-code {
+		font-size: 1.1rem;
+		color: white;
+		background: linear-gradient(135deg, #FF9800, #F57C00);
+		padding: 0.5rem 1rem;
+		border-radius: 25px;
+		display: inline-block;
+		font-family: "Courier New", monospace;
+		font-weight: 600;
+		align-self: flex-start;
+	}
+
+	.product-detail-price {
+		font-size: 2.5rem;
+		color: #4CAF50;
+		font-weight: 700;
+		text-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+	}
+
+	.product-detail-description {
+		font-size: 1.1rem;
+		color: #555;
+		line-height: 1.6;
+		background: #f8f9fa;
+		padding: 1rem;
+		border-radius: 10px;
+		border-left: 4px solid #2196F3;
+	}
+
+	.product-stats-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
+	.stat-card {
+		background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+		padding: 1.5rem;
+		border-radius: 15px;
+		text-align: center;
+		border: 1px solid #dee2e6;
+		transition: all 0.3s ease;
+	}
+
+	.stat-card:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+	}
+
+	.stat-label {
+		font-size: 0.9rem;
 		color: #6c757d;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
 	}
 
-	.showcase-empty-state {
-		padding: 4rem 2rem;
+	.stat-value {
+		font-size: 1.4rem;
+		color: #2c3e50;
+		font-weight: 700;
+		margin-top: 0.5rem;
+	}
+
+	.product-actions {
+		margin-top: 2rem;
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	.action-btn {
+		padding: 0.75rem 2rem;
+		border-radius: 25px;
+		font-weight: 600;
+		border: none;
+		transition: all 0.3s ease;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.action-btn:hover {
+		transform: translateY(-2px);
+		text-decoration: none;
+	}
+
+	/* No Products Section */
+	.no-products-section {
+		padding: 3rem 0;
+	}
+
+	.no-products-card {
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+		margin: 2rem;
+	}
+
+	.no-products-content {
+		padding: 3rem;
 		text-align: center;
 	}
 
-	.empty-state-icon {
-		font-size: 4rem;
-		color: #bdc3c7;
+	.no-products-icon {
+		font-size: 5rem;
+		color: #FF9800;
+		margin-bottom: 1.5rem;
+		opacity: 0.8;
+	}
+
+	.no-products-content h3 {
+		color: #2c3e50;
+		font-weight: 600;
 		margin-bottom: 1rem;
 	}
 
-	/* Modal Styles */
+	.search-suggestions-list {
+		list-style: none;
+		padding: 0;
+		margin: 1.5rem 0;
+		text-align: left;
+		display: inline-block;
+	}
+
+	.search-suggestions-list li {
+		padding: 0.5rem 0;
+		color: #6c757d;
+		position: relative;
+		padding-left: 1.5rem;
+	}
+
+	.search-suggestions-list li:before {
+		content: "•";
+		color: #FF9800;
+		font-size: 1.2rem;
+		position: absolute;
+		left: 0;
+	}
+
+	/* Enhanced Modal Styles */
 	.modal-content {
-		border-radius: 16px;
+		border-radius: 20px;
 		border: none;
-		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+		overflow: hidden;
+	}
+
+	.image-modal-content {
+		background: #000;
+	}
+
+	.image-modal-content .modal-header {
+		background: rgba(0, 0, 0, 0.8);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.image-modal-content .modal-body {
+		background: #000;
+		padding: 0;
+	}
+
+	.image-modal-content .modal-footer {
+		background: rgba(0, 0, 0, 0.8);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.zoom-image {
+		max-height: 70vh;
+		width: auto;
+		cursor: zoom-in;
+		transition: transform 0.3s ease;
+	}
+
+	.zoom-image:hover {
+		transform: scale(1.05);
+	}
+
+	.image-info {
+		color: white;
+		padding: 1rem;
 	}
 
 	.modal-header {
 		border-bottom: 1px solid #e9ecef;
-		border-radius: 16px 16px 0 0;
-		color: white;
+		border-radius: 20px 20px 0 0;
 	}
 
 	.modal-header .close {
-		color: white;
 		opacity: 0.8;
+		font-size: 1.5rem;
 	}
 
 	.modal-header .close:hover {
 		opacity: 1;
+		transform: scale(1.1);
 	}
 
 	/* Responsive Design */
+	@media (max-width: 992px) {
+		.product-info-grid {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.product-stats-grid {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.header-title {
+			font-size: 1.5rem;
+		}
+
+		.quick-stats {
+			margin-top: 1rem;
+			flex-direction: row;
+			justify-content: flex-end;
+			gap: 1rem;
+		}
+	}
+
 	@media (max-width: 768px) {
-		.showcase-title {
+		.stock-management-container {
+			background-attachment: scroll;
+		}
+
+		.search-card,
+		.product-card,
+		.loading-card,
+		.no-products-card {
+			margin: 1rem;
+		}
+
+		.search-body,
+		.product-body {
+			padding: 1.5rem;
+		}
+
+		.product-detail-title {
+			font-size: 1.8rem;
+		}
+
+		.product-detail-price {
 			font-size: 2rem;
 		}
 
-		.showcase-product-detail {
-			margin: 1rem 0.5rem;
-			padding: 1.5rem;
+		.product-detail-image {
+			height: 250px;
+		}
+
+		.search-input {
+			font-size: 1rem;
+			padding: 0.875rem 0.875rem 0.875rem 2.5rem !important;
+		}
+
+		.search-icon {
+			left: 0.75rem;
+			font-size: 1rem;
+		}
+
+		.search-buttons {
+			flex-direction: column;
+			gap: 0.25rem;
+		}
+
+		.search-btn,
+		.clear-btn {
+			padding: 0.5rem 1rem;
+			font-size: 0.9rem;
+		}
+
+		.product-actions {
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.action-btn {
+			width: 100%;
+			max-width: 300px;
+			justify-content: center;
+		}
+	}
+
+	@media (max-width: 576px) {
+		.stock-header {
+			padding: 0.75rem 0;
+		}
+
+		.header-content {
+			text-align: center;
+		}
+
+		.header-title {
+			font-size: 1.3rem;
+		}
+
+		.quick-stats {
+			justify-content: center;
+			margin-top: 0.75rem;
+		}
+
+		.search-header,
+		.product-header {
+			padding: 1rem 1.5rem;
+		}
+
+		.search-body,
+		.product-body {
+			padding: 1rem;
 		}
 
 		.product-detail-title {
@@ -365,66 +831,153 @@ block page_content %}
 		}
 
 		.product-detail-price {
-			font-size: 1.5rem;
+			font-size: 1.8rem;
 		}
 
 		.product-detail-image {
 			height: 200px;
 		}
 
-		.search-input-wrapper {
-			border-radius: 25px;
+		.product-stats-grid {
+			grid-template-columns: 1fr;
 		}
 
-		.showcase-search-input {
-			padding: 20px 60px 20px 50px !important;
-			font-size: 18px;
-		}
-
-		.search-icon {
-			left: 20px;
-			font-size: 16px;
-		}
-
-		.search-actions {
-			right: 5px;
-		}
-
-		.showcase-scan-btn {
-			padding: 10px 14px;
-			font-size: 14px;
-		}
-	}
-
-	@media (max-width: 576px) {
-		.showcase-header {
-			padding: 2rem 0;
-		}
-
-		.showcase-product-detail {
-			margin: 1rem 0.25rem;
+		.stat-card {
 			padding: 1rem;
 		}
 
-		.product-detail-title {
-			font-size: 1.25rem;
+		.modal-dialog {
+			margin: 0.5rem;
+		}
+	}
+
+	/* Print Styles */
+	@media print {
+		.stock-header,
+		.search-section,
+		.product-actions,
+		.modal-footer {
+			display: none;
 		}
 
-		.product-detail-price {
-			font-size: 1.25rem;
+		.product-card {
+			box-shadow: none;
+			border: 1px solid #000;
+		}
+
+		.product-detail-image {
+			max-height: 300px;
 		}
 	}
 </style>
 {% endblock %} {% block script %}
 <script>
-	// Initialize showcase when page loads
+	// Stock Management UI Enhancements
 	$(document).ready(function () {
 		// Initialize showcase
 		if (typeof showcase !== "undefined") {
-			console.log("Showcase initialized successfully");
+			console.log("Stock Management System initialized successfully");
 		} else {
 			console.error("Showcase object not found. Please check if showcase.js is loaded.");
 		}
+
+		// Update current time
+		function updateCurrentTime() {
+			const now = new Date();
+			const timeString = now.toLocaleTimeString('th-TH', {
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			});
+		}
+
+		// Update time every second
+		updateCurrentTime();
+		setInterval(updateCurrentTime, 1000);
+
+		// Auto-focus search input
+		$('#product-search').focus();
+
+		// Enhanced keyboard shortcuts
+		$(document).keydown(function(e) {
+			// F1 - Focus search
+			if (e.which === 112) {
+				e.preventDefault();
+				$('#product-search').focus().select();
+			}
+			// F2 - Clear search
+			else if (e.which === 113) {
+				e.preventDefault();
+				showcase.clearSearch();
+			}
+			// ESC - Close modals and clear search
+			else if (e.which === 27) {
+				$('.modal').modal('hide');
+				if ($('#product-search').val()) {
+					showcase.clearSearch();
+				}
+			}
+		});
+
+		// Add keyboard shortcuts info tooltip
+		$('#product-search').attr('title', 'คีย์ลัด: F1=โฟกัส, F2=ล้าง, ESC=ยกเลิก');
+
+		// Add loading animation to buttons
+		$('.search-btn').click(function() {
+			const btn = $(this);
+			const originalHtml = btn.html();
+			btn.html('<i class="fa fa-spinner fa-spin"></i> กำลังค้นหา...');
+			btn.prop('disabled', true);
+			
+			setTimeout(() => {
+				btn.html(originalHtml);
+				btn.prop('disabled', false);
+			}, 2000);
+		});
 	});
+
+	// Extend showcase object with new functionality
+	if (typeof showcase !== "undefined") {
+		// Clear search function
+		showcase.clearSearch = function() {
+			$('#product-search').val('').focus();
+			this.searchKeyword = '';
+			this.hideSuggestions();
+			$('#product-detail').hide();
+			$('#no-products').hide();
+			$('#loading-state').hide();
+		};
+
+		// Show image in modal
+		showcase.showImageModal = function(imageSrc, productName, productCode) {
+			$('#modalImage').attr('src', imageSrc);
+			$('#imageProductName').text(productName);
+			$('#imageProductCode').text(productCode);
+			$('#imageModal').modal('show');
+		};
+
+		// Download image function
+		showcase.downloadImage = function() {
+			const imageSrc = $('#modalImage').attr('src');
+			const productName = $('#imageProductName').text();
+			
+			if (imageSrc) {
+				const link = document.createElement('a');
+				link.href = imageSrc;
+				link.download = `${productName}_image.jpg`;
+				link.target = '_blank';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		};
+
+		// Print product info function
+		showcase.printProductInfo = function() {
+			if (this.currentProductId) {
+				window.print();
+			}
+		};
+	}
 </script>
 {% endblock %}
