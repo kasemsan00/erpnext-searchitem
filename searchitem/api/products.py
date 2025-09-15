@@ -760,6 +760,10 @@ def get_safe_image_url(image_field):
         if image_field.startswith('http'):
             return image_field
         
+        # Convert Windows-style backslashes to forward slashes for URLs
+        if '\\' in image_field:
+            image_field = image_field.replace('\\', '/')
+        
         # Handle file attachment paths
         if image_field.startswith('/files/') or image_field.startswith('/private/files/'):
             # For file paths, use frappe.utils.get_url to get the full URL

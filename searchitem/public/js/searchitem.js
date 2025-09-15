@@ -269,7 +269,7 @@ searchitem = {
 		products.forEach((product) => {
 			// Add search method indicator for debugging (only for System Managers)
 			const searchMethodBadge =
-				product.search_method && frappe.user.has_role("System Manager")
+				product.search_method 
 					? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
 					: "";
 
