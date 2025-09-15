@@ -65,38 +65,6 @@ searchitem = {
 			$img.replaceWith('<div class="no-image-placeholder">ไม่มีรูปภาพ</div>');
 		});
 
-		// Add diagnostic button (for debugging)
-		this.addDiagnosticButton();
-	},
-
-	// Add diagnostic button for debugging
-	addDiagnosticButton: function () {
-		// Add a small diagnostic button (only visible in development)
-		if (frappe.user.has_role("System Manager")) {
-			const diagnosticContainer = $(
-				'<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>'
-			);
-
-			const searchDiagnosticBtn = $(
-				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
-			);
-			searchDiagnosticBtn.click(() => this.runDiagnostic());
-
-			const imageDiagnosticBtn = $(
-				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
-			);
-			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
-
-			const unifiedSearchTestBtn = $(
-				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
-			);
-			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
-
-			diagnosticContainer.append(searchDiagnosticBtn);
-			diagnosticContainer.append(imageDiagnosticBtn);
-			diagnosticContainer.append(unifiedSearchTestBtn);
-			$(".searchitem-container").append(diagnosticContainer);
-		}
 	},
 
 	// Run diagnostic test
