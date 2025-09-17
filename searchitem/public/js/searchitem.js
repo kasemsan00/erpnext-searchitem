@@ -27,7 +27,6 @@ searchitem = {
 
 		// Enter key for item code search
 		$(document).on("keydown", "#product-search", function (e) {
-			console.log("Key pressed :", e.key);
 			if (e.key === "Enter") {
 				e.preventDefault();
 				console.log("Enter key detected, handling search for:", $(this).val());
@@ -59,12 +58,9 @@ searchitem = {
 		// Handle image errors - show HTML text instead of default image
 		$(document).on("error", "img", function () {
 			const $img = $(this);
-			const $container = $img.closest(".product-image-container, .suggestion-item");
-
 			// Replace image with HTML text
 			$img.replaceWith('<div class="no-image-placeholder">ไม่มีรูปภาพ</div>');
 		});
-
 	},
 
 	// Run diagnostic test
@@ -439,7 +435,6 @@ searchitem = {
 			<div class="product-body">
 				<div class="product-image-container">
 					${imageHtml}
-					${safeImageUrl ? '<div class="image-overlay">คลิกเพื่อขยาย</div>' : ""}
 				</div>
 				
 				<div class="product-info-simple">
@@ -555,7 +550,7 @@ searchitem = {
 
 		// Set the image source
 		$("#modalImage").attr("src", safeImageUrl);
-		
+
 		// Set product information if elements exist
 		if ($("#imageProductName").length) {
 			$("#imageProductName").text(productName || "");
@@ -563,7 +558,7 @@ searchitem = {
 		if ($("#imageProductCode").length) {
 			$("#imageProductCode").text(productCode || "");
 		}
-		
+
 		// Show the modal
 		$("#imageModal").modal("show");
 	},

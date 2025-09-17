@@ -1,7 +1,6 @@
-{% extends "templates/web.html" %} {% block title %}{{ _("Stock Management - Product Search") }}{% endblock %} {%
-block page_content %}
+{% extends "templates/web.html" %} {% block title %}{{ _("Stock Management - Product Search") }}{%
+endblock %} {% block page_content %}
 <div class="stock-management-container">
-
 	<!-- Enhanced Search Section -->
 	<div class="search-section">
 		<div class="container-fluid">
@@ -9,7 +8,7 @@ block page_content %}
 				<div class="col-md-12">
 					<div class="search-card">
 						<div class="search-header">
-							<h3> ค้นหาสินค้า</h3>
+							<h3>ค้นหาสินค้า</h3>
 							<small class="">สแกนบาร์โค้ด หรือ ค้นหาจากรหัส/ชื่อสินค้า</small>
 						</div>
 						<div class="search-body">
@@ -42,11 +41,12 @@ block page_content %}
 									</div>
 								</div>
 							</div>
-							<div class="search-tips">
-								<span>เคล็ดลับ: ใช้เครื่องสแกนบาร์โค้ด หรือพิมพ์รหัสสินค้าแล้วกด Enter</span>
-							</div>
 						</div>
-						<div class="search-suggestions" id="search-suggestions" style="display: none">
+						<div
+							class="search-suggestions"
+							id="search-suggestions"
+							style="display: none"
+						>
 							<!-- Search suggestions will appear here -->
 						</div>
 					</div>
@@ -105,13 +105,17 @@ block page_content %}
 		<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 			<div class="modal-content image-modal-content">
 				<div class="modal-body text-center">
-					<img id="modalImage" src="" alt="Product Image" class="img-fluid zoom-image">
+					<img id="modalImage" src="" alt="Product Image" class="img-fluid zoom-image" />
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">
 						ปิด
 					</button>
-					<button type="button" class="btn btn-primary" onclick="searchitem.downloadImage()">
+					<button
+						type="button"
+						class="btn btn-primary"
+						onclick="searchitem.downloadImage()"
+					>
 						ดาวน์โหลด
 					</button>
 				</div>
@@ -124,10 +128,13 @@ block page_content %}
 		<div class="modal-dialog modal-xl" role="document">
 			<div class="modal-content">
 				<div class="modal-header bg-primary text-white">
-					<h5 class="modal-title">
-						รายละเอียดสินค้า
-					</h5>
-					<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+					<h5 class="modal-title">รายละเอียดสินค้า</h5>
+					<button
+						type="button"
+						class="close text-white"
+						data-dismiss="modal"
+						aria-label="Close"
+					>
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -138,7 +145,11 @@ block page_content %}
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">
 						ปิด
 					</button>
-					<button type="button" class="btn btn-info" onclick="searchitem.printProductInfo()">
+					<button
+						type="button"
+						class="btn btn-info"
+						onclick="searchitem.printProductInfo()"
+					>
 						พิมพ์ข้อมูล
 					</button>
 					<button type="button" class="btn btn-primary" id="viewFullDetails">
@@ -154,7 +165,7 @@ block page_content %}
 	/* Stock Management UI Styles */
 	body {
 		background: #f8f9fa;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	}
 
 	.stock-management-container {
@@ -225,7 +236,7 @@ block page_content %}
 	}
 
 	.search-header {
-		background: linear-gradient(135deg, #4CAF50, #45a049);
+		background: linear-gradient(135deg, #4caf50, #45a049);
 		color: white;
 		padding: 1.5rem 2rem;
 		border-bottom: none;
@@ -260,7 +271,7 @@ block page_content %}
 	}
 
 	.input-with-icon:focus-within {
-		border-color: #4CAF50;
+		border-color: #4caf50;
 		box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
 		background: white;
 	}
@@ -406,7 +417,7 @@ block page_content %}
 	}
 
 	.product-header {
-		background: linear-gradient(135deg, #2196F3, #1976D2);
+		background: linear-gradient(135deg, #2196f3, #1976d2);
 		color: white;
 		padding: 1.5rem 2rem;
 		display: flex;
@@ -428,6 +439,9 @@ block page_content %}
 		position: relative;
 		text-align: center;
 		margin-bottom: 2rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.product-detail-image {
@@ -443,7 +457,7 @@ block page_content %}
 
 	.product-detail-image:hover {
 		transform: scale(1.02);
-		border-color: #2196F3;
+		border-color: #2196f3;
 		box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3);
 	}
 
@@ -483,7 +497,7 @@ block page_content %}
 
 	.product-detail-price {
 		font-size: 2rem;
-		color: #4CAF50;
+		color: #4caf50;
 		font-weight: 700;
 		margin-bottom: 1.5rem;
 	}
@@ -495,7 +509,7 @@ block page_content %}
 		background: #f8f9fa;
 		padding: 1rem;
 		border-radius: 8px;
-		border-left: 3px solid #2196F3;
+		border-left: 3px solid #2196f3;
 	}
 
 	.product-details-simple {
@@ -575,7 +589,7 @@ block page_content %}
 
 	.no-products-icon {
 		font-size: 5rem;
-		color: #FF9800;
+		color: #ff9800;
 		margin-bottom: 1.5rem;
 		opacity: 0.8;
 	}
@@ -603,7 +617,7 @@ block page_content %}
 
 	.search-suggestions-list li:before {
 		content: "•";
-		color: #FF9800;
+		color: #ff9800;
 		font-size: 1.2rem;
 		position: absolute;
 		left: 0;
@@ -859,10 +873,10 @@ block page_content %}
 		// Update current time
 		function updateCurrentTime() {
 			const now = new Date();
-			const timeString = now.toLocaleTimeString('th-TH', {
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
+			const timeString = now.toLocaleTimeString("th-TH", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit",
 			});
 		}
 
@@ -871,14 +885,14 @@ block page_content %}
 		setInterval(updateCurrentTime, 1000);
 
 		// Auto-focus search input
-		$('#product-search').focus();
+		$("#product-search").focus();
 
 		// Enhanced keyboard shortcuts
-		$(document).keydown(function(e) {
+		$(document).keydown(function (e) {
 			// F1 - Focus search
 			if (e.which === 112) {
 				e.preventDefault();
-				$('#product-search').focus().select();
+				$("#product-search").focus().select();
 			}
 			// F2 - Clear search
 			else if (e.which === 113) {
@@ -887,26 +901,26 @@ block page_content %}
 			}
 			// ESC - Close modals and clear search
 			else if (e.which === 27) {
-				$('.modal').modal('hide');
-				if ($('#product-search').val()) {
+				$(".modal").modal("hide");
+				if ($("#product-search").val()) {
 					searchitem.clearSearch();
 				}
 			}
 		});
 
 		// Add keyboard shortcuts info tooltip
-		$('#product-search').attr('title', 'คีย์ลัด: F1=โฟกัส, F2=ล้าง, ESC=ยกเลิก');
+		$("#product-search").attr("title", "คีย์ลัด: F1=โฟกัส, F2=ล้าง, ESC=ยกเลิก");
 
 		// Add loading animation to buttons
-		$('.search-btn').click(function() {
+		$(".search-btn").click(function () {
 			const btn = $(this);
 			const originalHtml = btn.html();
-			btn.html('กำลังค้นหา...');
-			btn.prop('disabled', true);
-			
+			btn.html("กำลังค้นหา...");
+			btn.prop("disabled", true);
+
 			setTimeout(() => {
 				btn.html(originalHtml);
-				btn.prop('disabled', false);
+				btn.prop("disabled", false);
 			}, 2000);
 		});
 	});
@@ -914,31 +928,31 @@ block page_content %}
 	// Extend searchitem object with new functionality
 	if (typeof searchitem !== "undefined") {
 		// Clear search function
-		searchitem.clearSearch = function() {
-			$('#product-search').val('').focus();
-			this.searchKeyword = '';
+		searchitem.clearSearch = function () {
+			$("#product-search").val("").focus();
+			this.searchKeyword = "";
 			this.hideSuggestions();
-			$('#product-detail').hide();
-			$('#no-products').hide();
-			$('#loading-state').hide();
+			$("#product-detail").hide();
+			$("#no-products").hide();
+			$("#loading-state").hide();
 		};
 
 		// Show image in modal
-		searchitem.showImageModal = function(imageSrc, productName, productCode) {
-			$('#modalImage').attr('src', imageSrc);
-			$('#imageModal').modal('show');
+		searchitem.showImageModal = function (imageSrc, productName, productCode) {
+			$("#modalImage").attr("src", imageSrc);
+			$("#imageModal").modal("show");
 		};
 
 		// Download image function
-		searchitem.downloadImage = function() {
-			const imageSrc = $('#modalImage').attr('src');
-			const productName = $('#imageProductName').text();
-			
+		searchitem.downloadImage = function () {
+			const imageSrc = $("#modalImage").attr("src");
+			const productName = $("#imageProductName").text();
+
 			if (imageSrc) {
-				const link = document.createElement('a');
+				const link = document.createElement("a");
 				link.href = imageSrc;
 				link.download = `${productName}_image.jpg`;
-				link.target = '_blank';
+				link.target = "_blank";
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
@@ -946,7 +960,7 @@ block page_content %}
 		};
 
 		// Print product info function
-		searchitem.printProductInfo = function() {
+		searchitem.printProductInfo = function () {
 			if (this.currentProductId) {
 				window.print();
 			}
