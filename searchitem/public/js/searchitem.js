@@ -264,10 +264,9 @@ searchitem = {
 
 		products.forEach((product) => {
 			// Add search method indicator for debugging (only for System Managers)
-			const searchMethodBadge =
-				product.search_method 
-					? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
-					: "";
+			const searchMethodBadge = product.search_method
+				? `<span class="badge badge-info badge-sm ml-2">${product.search_method}</span>`
+				: "";
 
 			const safeImageUrl = this.getSafeImageUrl(product.image);
 			const imageHtml = safeImageUrl
