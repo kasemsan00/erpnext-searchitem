@@ -59,44 +59,9 @@ searchitem = {
 		// Handle image errors - show HTML text instead of default image
 		$(document).on("error", "img", function () {
 			const $img = $(this);
-			const $container = $img.closest(".product-image-container, .suggestion-item");
-
 			// Replace image with HTML text
 			$img.replaceWith('<div class="no-image-placeholder">ไม่มีรูปภาพ</div>');
 		});
-
-		// Add diagnostic button (for debugging)
-		this.addDiagnosticButton();
-	},
-
-	// Add diagnostic button for debugging
-	addDiagnosticButton: function () {
-		// Add a small diagnostic button (only visible in development)
-		if (frappe.user.has_role("System Manager")) {
-			const diagnosticContainer = $(
-				'<div style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></div>'
-			);
-
-			const searchDiagnosticBtn = $(
-				'<button class="btn btn-sm btn-warning mr-2">🔍 Search Debug</button>'
-			);
-			searchDiagnosticBtn.click(() => this.runDiagnostic());
-
-			const imageDiagnosticBtn = $(
-				'<button class="btn btn-sm btn-info mr-2">🖼️ Image Debug</button>'
-			);
-			imageDiagnosticBtn.click(() => this.runImageDiagnostic());
-
-			const unifiedSearchTestBtn = $(
-				'<button class="btn btn-sm btn-success">🔄 Test Unified Search</button>'
-			);
-			unifiedSearchTestBtn.click(() => this.testUnifiedSearch());
-
-			diagnosticContainer.append(searchDiagnosticBtn);
-			diagnosticContainer.append(imageDiagnosticBtn);
-			diagnosticContainer.append(unifiedSearchTestBtn);
-			$(".searchitem-container").append(diagnosticContainer);
-		}
 	},
 
 	// Run diagnostic test
@@ -471,7 +436,6 @@ searchitem = {
 			<div class="product-body">
 				<div class="product-image-container">
 					${imageHtml}
-					${safeImageUrl ? '<div class="image-overlay">คลิกเพื่อขยาย</div>' : ""}
 				</div>
 				
 				<div class="product-info-simple">
@@ -587,7 +551,7 @@ searchitem = {
 
 		// Set the image source
 		$("#modalImage").attr("src", safeImageUrl);
-		
+
 		// Set product information if elements exist
 		if ($("#imageProductName").length) {
 			$("#imageProductName").text(productName || "");
@@ -595,7 +559,7 @@ searchitem = {
 		if ($("#imageProductCode").length) {
 			$("#imageProductCode").text(productCode || "");
 		}
-		
+
 		// Show the modal
 		$("#imageModal").modal("show");
 	},
