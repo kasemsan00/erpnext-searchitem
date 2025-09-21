@@ -15,7 +15,7 @@ app_version = "1.0.0"
 add_to_apps_screen = [
 	{
 		"name": "searchitem",
-		"logo": "/assets/searchitem/images/logo2.png",
+		"logo": "/assets/searchitem/images/app-icon.png",
 		"title": "Search item",
 		"route": "/searchitem",
 		"has_permission": "searchitem.api.permission.has_app_permission"
